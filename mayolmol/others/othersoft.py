@@ -3,7 +3,7 @@
 import os
 import os.path as op
 import urllib
-from mayolmol.utils.utils import ensure_dir, extract
+from mayolmol.utils import ensure_dir, extract
 
 class OtherSoft():
 

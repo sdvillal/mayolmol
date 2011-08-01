@@ -15,7 +15,3 @@ def spectrophores(mols):
     spectromaker = pybel.ob.OBSpectrophore()
     specs = [spectromaker.GetSpectrophore(mol.OBMol) for mol in mols]
     return numpy.array(specs)
-
-#    specs = ob_descriptors.spectrophores(trainMols + testMols)
-#    numpy.savetxt(op.join(datasetRoot, name + '-spectrophores.csv'),
-#                  specs, fmt='%.6f', delimiter=',')

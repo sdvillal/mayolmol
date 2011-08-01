@@ -19,6 +19,7 @@ usage: cdkdescui [OPTIONS] inputfile
 CDKDescUI v1.3.2 Rajarshi Guha <rajarshi.guha@gmail.com>
 """
 
+import os.path as op
 
 class CDKDescUIDriver():
     def __init__(self,

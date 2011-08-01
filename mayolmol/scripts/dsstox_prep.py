@@ -21,6 +21,8 @@ import urllib
 from zipfile import ZipFile
 import argparse
 
+DEFAULT_DSSTOX_DIR = op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'dsstox')
+
 def rename_mols_by_index(mols, prefix=''):
     num_mols_num_chars = len(str(len(mols)))
     for i, mol in enumerate(mols):
@@ -104,9 +106,8 @@ def prepare_dsstox_dataset(root, name, dest=None):
     create_saliviewer_input(masterTable, saliTable)
 
 if __name__ == '__main__':
-
     #######################################
-    #Parse options
+    # Parse options
     #######################################
     parser = argparse.ArgumentParser(description='DSSTox preparation script')
     parser.add_argument('-r', '--root',
@@ -116,11 +117,11 @@ if __name__ == '__main__':
 
     root = args.root
     if not root:
-        root = op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'dsstox')
+        root = DEFAULT_DSSTOX_DIR
     dest = args.root
 
     #######################################
-    #Make sure we have the original data
+    # Make sure we have the original data
     #######################################
     def present_datasets(root):
         """ Search the dsstox-like datasets in a directory and return their names """
@@ -143,7 +144,11 @@ if __name__ == '__main__':
         ZipFile(compressedFile).extractall(root)
         datasets = present_datasets(root)
 
+    #######################################
+    # Prepare the datasets
+    #######################################
     def prepare(dataset):
         prepare_dsstox_dataset(root, dataset, dest)
+
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
     pool.map(prepare, datasets)
