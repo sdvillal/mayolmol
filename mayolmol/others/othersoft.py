@@ -3,18 +3,7 @@
 import os
 import os.path as op
 import urllib
-import tarfile
-
-def ensure_dir(dir):
-    if not op.exists(dir):
-        os.makedirs(dir)
-
-def extract(tar_url, extract_path='.'):
-    tar = tarfile.open(tar_url)
-    for item in tar:
-        tar.extract(item, extract_path)
-        if item.name.find(".tgz") != -1 or item.name.find(".tar") != -1:
-            extract(item.name, "./" + item.name[:item.name.rfind('/')])
+from mayolmol.utils.utils import ensure_dir, extract
 
 class OtherSoft():
 

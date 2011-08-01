@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-''' Simple I/O without dependencies to any non-standard package other than numpy.
+""" Simple I/O without dependencies to any non-standard package other than numpy.
     mldata-utils, arff, orange and the like could be useful here.
     Requires python >= 2.6
-'''
+"""
 import os
 import shlex
 import csv
@@ -13,12 +13,12 @@ def generate_names(num, prefix='f-'):
     return [prefix + str(fNum).zfill(num_digits) for fNum in range(num)]
 
 def load_arff(src):
-    ''' Load a dense arff with continuous features and a nominal class as the last attribute.
+    """ Load a dense arff with continuous features and a nominal class as the last attribute.
         No support for sparsity, string, nominal or date attributes, missing values,
         weights, comments and other goodies, no error checking, but this will do for the moment.
         There are many alternatives, the only one that does not add dependencies is
         scipy's arffloader, but it is quite buggy.
-    '''
+    """
     name = None
     attributes = []
     classes = {}

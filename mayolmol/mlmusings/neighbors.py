@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-''' Some methods for working with neighborhoods of data points '''
+""" Some methods for working with neighborhoods of data points """
 import os
 import numpy as np
 
 def nns(x, k=5):
-    '''NNs under Euclidean distance
+    """NNs under Euclidean distance
        Note that by default we are using an stable sort to get the points sorted,
        so we are subject to order artifacts in the original data (like having
        the points sorted by class). To avoid them, pre-shuffle x.
-    '''
+    """
     nns = []
     for ex in range(x.shape[0]): #At least lets not keep the whole ne x ne distance matrix in memory
         distances = ((x - x[ex,:]) ** 2).sum(1) #Oh well, n² distance computations, we could do half using heaps...
@@ -38,7 +38,7 @@ def nn_acc(nns, y, k=None):
     return 1.0 - nn_error(nns, y, k)
 
 def vizrank(x, y, k=10):
-    ''' Naive vizrank implementation '''
+    """ Naive vizrank implementation """
     _, nf = x.shape
     scores = []
     for i in range(nf):

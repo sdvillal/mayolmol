@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-''' A few kernel functions '''
+""" A few kernel functions """
 
 from numpy import *
 
