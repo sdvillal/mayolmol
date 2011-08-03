@@ -60,7 +60,7 @@ def create_master_table(sdf_file, dest_file, fields=None):
             writer.write(','.join(values) + '\n')
 
 def create_saliviewer_input(master_file, dest_file):
-    input = select_columns(master_file)[1:] #Remove the header
+    input = select_columns(master_file, (1, 0, 2))[1:] #Remove the header
     with open(dest_file, 'w') as output:
         output = csv.writer(output, delimiter=' ')
         for values in input:
