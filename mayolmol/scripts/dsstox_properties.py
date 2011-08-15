@@ -5,6 +5,7 @@ import os
 import os.path as op
 import pybel
 import argparse
+import math
 import numpy
 from mayolmol.descriptors import ob
 from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
@@ -13,9 +14,9 @@ def spectrophores(dataset):
     try:
         print 'Computing spectrophores for dataset %s' % dataset
         specs = ob.spectrophores(pybel.readfile('sdf', dataset))
-        datasetRoot, datasetName = op.split(dataset)
-        datasetName = op.splitext(datasetName)[0]
-        numpy.savetxt(op.join(datasetRoot, datasetName + '-spectrophores.csv'),
+        dataset_root, dataset_name = op.split(dataset)
+        dataset_name = op.splitext(dataset_name)[0]
+        numpy.savetxt(op.join(dataset_root, dataset_name + '-spectrophores.csv'),
                       specs, fmt='%.6f', delimiter=',')
         print 'Spectrophores for dataset %s computed succesfully' % dataset
     except Exception, e:
