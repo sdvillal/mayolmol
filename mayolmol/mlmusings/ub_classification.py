@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import io
+from mayolmol.mlmusings import mlio
 import neighbors
 import os
 import sys #TODO: check PEP 366
@@ -36,12 +37,8 @@ def ubigraph_populate(neighbors, y, U=None):
                       style=(styleWrongEdge if y[i] != y[int(nn)] else None))
 
 def ubigraph_file(src, k=5):
-    _, _, _, x, y = io.load_arff(src)
+    _, _, _, x, y = mlio.load_arff(src)
     ubigraph_data(x, y, k)
 
 def ubigraph_data(x, y, k=5):
     ubigraph_populate(neighbors.nns(x, k), y)
-
-PETECAN_ROOT = os.path.join(os.path.expanduser('~'), 'Proyectos', 'data', 'wikipedia-motifs')
-ORIGINAL_DATA = os.path.join(PETECAN_ROOT, 'ArticleEgoMotifCounts.arff')
-ubigraph_file(ORIGINAL_DATA)

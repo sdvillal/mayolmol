@@ -13,6 +13,7 @@ class OtherSoft():
 
     @staticmethod
     def install_ubigraph(root):
+        print 'Installing ubigraph'
         root = op.join(root, 'ubigraph')
         if not op.exists(root):
             os.makedirs(root)
