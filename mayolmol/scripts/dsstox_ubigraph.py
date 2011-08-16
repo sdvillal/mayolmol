@@ -6,6 +6,7 @@ import random
 import threading
 import time
 import gtk
+import gobject
 import numpy
 from mayolmol.mlmusings import neighbors
 from mayolmol.others import ubigraph, gtkpoc
@@ -47,26 +48,25 @@ class UbigraphHelper():
                 U.newEdge(nodes[nodeIndex], nodes[int(nn)],
                           style=(styleWrongEdge if y[nodeIndex] != y[int(nn)] else None))
 
-
 def chem_ubigraph(x, y, pics=glob.glob('/home/santi/Proyectos/bsc/data/filtering/dsstox/BCF/depictions/*.png')):
     iw = gtkpoc.ImageWindow(pics)
-
     def vertex_callback(v):
         gtk.threads_enter()
         iw.setPic(v)
         gtk.threads_leave()
         return 0
-
     port = random.randint(20739, 20999)
     U = UbigraphHelper(callback_port=port)
     U.populate(neighbors.nns(x), y)
     server = SimpleXMLRPCServer(("localhost", port))
     server.register_introspection_functions()
     server.register_function(vertex_callback, 'vertex_callback')
-    #Bring in the GTK window
-    threading.Thread(target=gtkpoc.gtk_run()).start()
     #Serve
-    server.serve_forever()
+    print 'Serving for ubigraph double clicks...'
+    serving = lambda: threading.Thread(target=server.serve_forever).start()
+    gobject.idle_add(serving)  #Actually it is enough to run this out of the GTK event thread...
+    #Bring in the GTK window
+    gtkpoc.gtk_run()
 
 def random_problem(num_points=800, dimensionality=30):
     x = numpy.random.normal(size=(num_points, dimensionality))
