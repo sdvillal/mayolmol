@@ -9,7 +9,7 @@ import gtk
 import gobject
 import numpy
 from mayolmol.mlmusings import neighbors
-from mayolmol.others import ubigraph, gtkpoc
+from mayolmol.others import ubigraph, gtkpoc, othersoft
 
 class UbigraphHelper():
     def __init__(self, U=None, callback_port=None):
@@ -19,7 +19,7 @@ class UbigraphHelper():
 
     @staticmethod
     def connect(ubigraph_location=None, clear=True):
-        if not ubigraph_location: os.system('ubigraph_server -quiet &')
+        if not ubigraph_location: os.system(othersoft.OtherSoft().ubigraph +' -quiet &')
         else: os.system(op.join(ubigraph_location, 'ubigraph_server' + ' -quiet &'))
         time.sleep(1)
         U = ubigraph.Ubigraph()
@@ -75,7 +75,7 @@ def random_problem(num_points=800, dimensionality=30):
 
 def dsstox_problem(name='BCF'):
     root = op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'dsstox', name)
-    x = numpy.loadtxt(op.join(root, name +'-spectrophores.csv'), delimiter=',')
+    x = numpy.loadtxt(op.join(root, name +'-ob-spectrophores.csv'), delimiter=',')
     with open(op.join(root, name +'-master.csv')) as master:
         master.next()
         y = [1 if float(line.split(',')[2]) > 1 else 0 for line in master]

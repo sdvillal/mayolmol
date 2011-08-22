@@ -3,7 +3,7 @@
     mldata-utils, arff, orange and the like could be useful here.
     Requires python >= 2.6
 """
-import os
+import os.path as op
 import shlex
 import csv
 import numpy as np
@@ -13,7 +13,7 @@ def generate_names(num, prefix='f-'):
     return [prefix + str(fNum).zfill(num_digits) for fNum in range(num)]
 
 def load_arff(src):
-    """ Load a dense arff with continuous features and a nominal class as the last attribute.
+    """ Load a dense arff with continuous features and a class as the last attribute.
         No support for sparsity, string, nominal or date attributes, missing values,
         weights, comments and other goodies, no error checking, but this will do for the moment.
         There are many alternatives, the only one that does not add dependencies is
@@ -60,7 +60,7 @@ def save_tab(x, y, dest, format='%.8g'):
         row += [int(y[i])]
         writer.writerow(row)
 
-def save_arff(x, y, dest, relation_name='Unknown', feature_names=None, format='%.8g'):
+def save_arff(x, y, dest, relation_name='Unknown', feature_names=None, format='%.8g', classes=None):
     ne, nf = x.shape
     if not feature_names: feature_names = generate_names(nf)
     with open(dest, 'w') as dest:
@@ -73,3 +73,18 @@ def save_arff(x, y, dest, relation_name='Unknown', feature_names=None, format='%
         for row in xrange(ne):
             dest.write(','.join((format % val for val in x[row,:])))
             dest.write(',' + str(int(y[row])) + '\n')
+
+def mergearffs(dest, arff1, *args):
+    if not dest:
+        dest = op.splitext(arff1)[0] + '-merged.arff'
+    with open(dest, 'w') as dest:
+        with open(arff1) as src:
+            for line in src:
+                dest.write(line)
+        for other_arff in args:
+            with open(other_arff) as src:
+                for line in src:
+                    if line.strip()=='@data':
+                        break
+                for line in src:
+                    dest.write(line)

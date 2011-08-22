@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
-""" Generate spectrophores for the DSSTox datasets """
-import multiprocessing
+""" Generate different properties for the DSSTox datasets """
 import os
 import os.path as op
 import pybel
 import argparse
-import math
 import numpy
-from mayolmol.descriptors import ob
+from mayolmol.descriptors import cdkdescui, ob
 from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
 
 def spectrophores(dataset):
+    """ Compute the spectrophores for a dataset """
     try:
-        print 'Computing spectrophores for dataset %s' % dataset
+        print '\tSpectrophores'
         specs = ob.spectrophores(pybel.readfile('sdf', dataset))
         dataset_root, dataset_name = op.split(dataset)
         dataset_name = op.splitext(dataset_name)[0]
-        numpy.savetxt(op.join(dataset_root, dataset_name + '-spectrophores.csv'),
+        numpy.savetxt(op.join(dataset_root, dataset_name + '-ob-spectrophores.csv'),
                       specs, fmt='%.6f', delimiter=',')
-        print 'Spectrophores for dataset %s computed succesfully' % dataset
+        print '\tSpectrophores computed succesfully'
     except Exception, e:
         print 'Damn, there has been a problem computing the pharmacophores...'
         print 'Research into this...'
@@ -42,7 +41,27 @@ if __name__ == '__main__':
     #######################################
     # Compute properties
     #######################################
+
     datasets = sorted([name for name in os.listdir(root) if op.isdir(op.join(root, name))])
     datasets = map(lambda dataset: op.join(root, dataset, dataset + '.sdf'), datasets)
-    pool = multiprocessing.Pool(multiprocessing.cpu_count())
-    pool.map(spectrophores, datasets)
+
+    #CDKDescUI based properties
+    CDK_DEFAULT_TYPES = ['constitutional', 'geometric']
+    CDK_DEFAULT_FINGERPRINTS = ['maccs', 'estate']
+
+    for dataset in datasets:
+        print 'Computing properties for %s' % dataset
+
+        for desc_type in CDK_DEFAULT_TYPES:
+            print '\t' + desc_type
+            cdkdescui.CDKDescUIDriver().compute_type(dataset,
+                                                     op.splitext(dataset)[0] + '-cdk-' + desc_type + '.csv',
+                                                     desc_type=desc_type,
+                                                     addH=True)
+        for fingerprint in CDK_DEFAULT_FINGERPRINTS:
+            print '\t' + fingerprint
+            cdkdescui.CDKDescUIDriver().compute_fingerprint(dataset,
+                                                            op.splitext(dataset)[0] + '-cdk-' + fingerprint + '.csv',
+                                                            fingerprint=fingerprint,
+                                                            addH=True)
+        spectrophores(dataset)
