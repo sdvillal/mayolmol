@@ -30,7 +30,7 @@ def load_arff(src):
             if line.strip().lower().startswith('@relation'):
                 name = shlex.split(line.strip())[1]
                 break
-            #Attributes
+                #Attributes
         for line in src:
             if line.strip().lower().startswith('@attribute'):
                 _, fName, spec = shlex.split(line.strip())
@@ -40,7 +40,7 @@ def load_arff(src):
                         classes[clazz.strip()] = len(classes)
             elif line.strip().lower().startswith('@data'):
                 break
-            #Data
+                #Data
         for line in src:
             data = line.strip().split(',')
             if len(data) == len(attributes):  #Lame check
@@ -49,10 +49,13 @@ def load_arff(src):
 
         return name, attributes, classes, np.array(x), np.array(y)
 
-def save_tab(x, y, dest, format='%.8g'):
+def save_tab(x, y, dest, format='%.8g', classes=None):
+    """ This should be saved with .txt or .csv extension, it is NOT tab
+     See http://orange.biolab.si/doc/reference/tabdelimited.htm
+    """
     ne, nf = x.shape
-    writer = csv.writer(open(dest, "w"))
-    writer.writerow(['C#feature-' + str(i) for i in range(nf)] + ['c#class'])
+    writer = csv.writer(open(dest, "w"), delimiter='\t')
+    writer.writerow(['C#feature-' + str(i) for i in range(nf)] + (['cD#class'] if classes else ['c#class']))
     for i in range(ne):
         row = []
         for j in range(nf):
@@ -67,11 +70,15 @@ def save_arff(x, y, dest, relation_name='Unknown', feature_names=None, format='%
         dest.write('@relation ' + relation_name + '\n\n')
         for fName in feature_names:
             dest.write('@attribute ' + fName + ' real\n')
-        classes = ",".join(map(str, map(int, sorted(np.unique(y)))))
-        dest.write('@attribute class {' + classes + '}\n')
+        if not classes:
+            classes = 'REAL'
+        else:
+            classes = '{' +','.join(map(str,classes)) + '}'
+        #        classes = ",".join(map(str, map(int, sorted(np.unique(y)))))
+        dest.write('@attribute class ' + classes + '\n')
         dest.write('@data\n')
         for row in xrange(ne):
-            dest.write(','.join((format % val for val in x[row,:])))
+            dest.write(','.join((format % val for val in x[row, :])))
             dest.write(',' + str(int(y[row])) + '\n')
 
 def mergearffs(dest, arff1, *args):
@@ -84,7 +91,7 @@ def mergearffs(dest, arff1, *args):
         for other_arff in args:
             with open(other_arff) as src:
                 for line in src:
-                    if line.strip()=='@data':
+                    if line.strip() == '@data':
                         break
                 for line in src:
                     dest.write(line)
