@@ -60,7 +60,7 @@ def save_tab(x, y, dest, format='%.8g', classes=None):
         row = []
         for j in range(nf):
             row += [format % x[i][j]]
-        row += [int(y[i])]
+        row += [y[i]]
         writer.writerow(row)
 
 def save_arff(x, y, dest, relation_name='Unknown', feature_names=None, format='%.8g', classes=None):
@@ -79,7 +79,7 @@ def save_arff(x, y, dest, relation_name='Unknown', feature_names=None, format='%
         dest.write('@data\n')
         for row in xrange(ne):
             dest.write(','.join((format % val for val in x[row, :])))
-            dest.write(',' + str(int(y[row])) + '\n')
+            dest.write(',' + str(y[row]) + '\n')
 
 def mergearffs(dest, arff1, *args):
     if not dest:
