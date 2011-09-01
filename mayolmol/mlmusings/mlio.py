@@ -6,6 +6,7 @@
 import os.path as op
 import shlex
 import csv
+import math
 import numpy as np
 
 def generate_names(num, prefix='f-'):
@@ -78,8 +79,9 @@ def save_arff(x, y, dest, relation_name='Unknown', feature_names=None, format='%
         dest.write('@attribute class ' + classes + '\n')
         dest.write('@data\n')
         for row in xrange(ne):
-            dest.write(','.join((format % val for val in x[row, :])))
-            dest.write(',' + str(y[row]) + '\n')
+            instance = map(lambda a: format % a if not math.isnan(a) else '?', x[row, :])
+            dest.write(','.join(instance))
+            dest.write(',' +(str(y[row]) if not math.isnan(y[row]) else '?') + '\n')
 
 def mergearffs(dest, arff1, *args):
     if not dest:
