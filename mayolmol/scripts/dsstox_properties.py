@@ -23,6 +23,20 @@ def spectrophores(dataset):
         print 'Research into this...'
         print e.message
 
+def cdkdescuiprops(dataset, desc_types = ('constitutional', 'geometric'), fingerprints=('maccs', 'estate')):
+    for desc_type in desc_types:
+        print '\t' + desc_type
+        cdkdescui.CDKDescUIDriver().compute_type(dataset,
+                                                 op.splitext(dataset)[0] + '-cdk-' + desc_type + '.csv',
+                                                 desc_type=desc_type,
+                                                 addH=True)
+    for fingerprint in fingerprints:
+        print '\t' + fingerprint
+        cdkdescui.CDKDescUIDriver().compute_fingerprint(dataset,
+                                                        op.splitext(dataset)[0] + '-cdk-' + fingerprint + '.csv',
+                                                        fingerprint=fingerprint,
+                                                        addH=True)
+
 if __name__ == '__main__':
     #######################################
     # Parse options
@@ -45,23 +59,7 @@ if __name__ == '__main__':
     datasets = sorted([name for name in os.listdir(root) if op.isdir(op.join(root, name))])
     datasets = map(lambda dataset: op.join(root, dataset, dataset + '.sdf'), datasets)
 
-    #CDKDescUI based properties
-    CDK_DEFAULT_TYPES = ['constitutional', 'geometric']
-    CDK_DEFAULT_FINGERPRINTS = ['maccs', 'estate']
-
     for dataset in datasets:
         print 'Computing properties for %s' % dataset
-
-        for desc_type in CDK_DEFAULT_TYPES:
-            print '\t' + desc_type
-            cdkdescui.CDKDescUIDriver().compute_type(dataset,
-                                                     op.splitext(dataset)[0] + '-cdk-' + desc_type + '.csv',
-                                                     desc_type=desc_type,
-                                                     addH=True)
-        for fingerprint in CDK_DEFAULT_FINGERPRINTS:
-            print '\t' + fingerprint
-            cdkdescui.CDKDescUIDriver().compute_fingerprint(dataset,
-                                                            op.splitext(dataset)[0] + '-cdk-' + fingerprint + '.csv',
-                                                            fingerprint=fingerprint,
-                                                            addH=True)
+        cdkdescuiprops(datasets)
         spectrophores(dataset)

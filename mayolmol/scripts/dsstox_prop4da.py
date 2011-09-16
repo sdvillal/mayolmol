@@ -19,7 +19,10 @@ def infer_classes(y):
     return sorted(yunique)
 
 def read_y(root, dataset):
-    with open(op.join(root, dataset, dataset + '-master.csv')) as master:
+    return read_y_from_master(op.join(root, dataset, dataset + '-master.csv'))
+
+def read_y_from_master(masterfile):
+    with open(masterfile) as master:
         master.next()
         y = [float(line.split(',')[2]) for line in master]
         return np.array(y)
@@ -53,38 +56,43 @@ def cdkdeskui2dense(cdkdescui_fpfile, sep='\t'):
         x = [map(floatOrNaN, line.strip().split(sep)[1:]) for line in src if len(line.strip())]
         return np.array(x[0:-1]), features
 
+def prop4da(dataset):
+    root, name = op.split(dataset)
+    name = op.splitext(name)[0]
+    masterfile = op.join(root, name + '-master.csv')
+    y = read_y_from_master(masterfile)
+    classes = infer_classes(y)
+
+    #Process ob spectrophores
+    specs = op.join(root, name + '-ob-spectrophores.csv')
+    with open(specs) as reader:
+        specs = []
+        for line in reader:
+            specs.append(map(lambda a: float(a.strip()), line.split(',')))
+        x = np.array(specs)
+    mlio.save_arff(x, y, op.join(root, name + '-ob-spectrophores.arff'), classes=classes)
+    mlio.save_tab(x, y, op.join(root, name + '-ob-spectrophores.txt'), classes=classes)
+
+    #Process CDK descriptors
+    for descs in glob.glob(op.join(root, dataset, '*-cdk-*.csv')):
+        with open(descs) as reader:
+            header = reader.next()
+            if header.startswith('Title'):
+                x, features = cdkdeskui2dense(descs)
+                mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', feature_names=features, classes=classes)
+                mlio.save_tab(x, y, op.splitext(descs)[0] + '.txt', classes=classes)
+            else:
+                x, name = cdkdeskuifps2dense(descs)
+                mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', relation_name=name, classes=classes)
+                mlio.save_tab(x, y, op.splitext(descs)[0] + '.txt', classes=classes)
+
 if __name__ == '__main__':
     root = DEFAULT_DSSTOX_DIR
     datasets = sorted([name for name in os.listdir(root) if op.isdir(op.join(root, name))])
 
     for dataset in datasets:
         print dataset
-
-        y = read_y(root, dataset)
-        classes = infer_classes(y)
-
-        #Process ob spectrophores
-        specs = op.join(root, dataset, dataset + '-ob-spectrophores.csv')
-        with open(specs) as reader:
-            specs = []
-            for line in reader:
-                specs.append(map(lambda a: float(a.strip()), line.split(',')))
-            x = np.array(specs)
-        mlio.save_arff(x, y, op.join(root, dataset, dataset + '-ob-spectrophores.arff'), classes=classes)
-        mlio.save_tab(x, y, op.join(root, dataset, dataset + '-ob-spectrophores.txt'), classes=classes)
-
-        #Process CDK descriptors
-        for descs in glob.glob(op.join(root, dataset, '*-cdk-*.csv')):
-            with open(descs) as reader:
-                header = reader.next()
-                if header.startswith('Title'):
-                    x, features = cdkdeskui2dense(descs)
-                    mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', feature_names=features, classes=classes)
-                    mlio.save_tab(x, y, op.splitext(descs)[0] + '.txt', classes=classes)
-                else:
-                    x, name = cdkdeskuifps2dense(descs)
-                    mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', relation_name=name, classes=classes)
-                    mlio.save_tab(x, y, op.splitext(descs)[0] + '.txt', classes=classes)
+        prop4da(dataset)
 
 #TODO: Save the compound ID too
 #TODO: be robust to failed description computation

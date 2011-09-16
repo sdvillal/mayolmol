@@ -10,6 +10,7 @@ class OtherSoft():
     CDKDESCUI_JAR_URL = 'http://rguha.net/code/java/CDKDescUI.jar'
     SALIVIEWER_JAR_URL = 'http://sali.rguha.net/sali.jar'
     UBIGRAPH_UBUNTU_URL = 'http://ubietylab.net/files/alpha-0.2.4/UbiGraph-alpha-0.2.4-Linux64-Ubuntu-8.04.tgz'
+    JCOMPOUNDMAPPER_JAR_URL = 'http://dfn.dl.sourceforge.net/project/jcompoundmapper/jCMapperCLI.jar'
 
     @staticmethod
     def install_ubigraph(root):
@@ -42,5 +43,8 @@ class OtherSoft():
 
         self.saliviewer = op.join(root, 'saliviewer', 'saliviewer.jar')
         OtherSoft.install_file(OtherSoft.SALIVIEWER_JAR_URL, self.saliviewer)
+
+        self.jcompoundmapper = op.join(root, 'jcompoundmapper', 'jcompoundmapper.jar')
+        OtherSoft.install_file(OtherSoft.JCOMPOUNDMAPPER_JAR_URL, self.jcompoundmapper)
 
 OtherSoft()
