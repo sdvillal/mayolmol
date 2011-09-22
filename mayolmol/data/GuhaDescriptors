@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<CDKDescUISettings version="1.0">
+    <descriptorList>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#ALOGP">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#BCUT">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#CPSA">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#NilaComplexity">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#WHIM">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#acidicGroupCount">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#aminoAcidsCount">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#apol">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#aromaticAtomsCount">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#aromaticBondsCount">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#atomCount">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#autoCorrelationCharge">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#autoCorrelationMass">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#autoCorrelationPolarizability">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#basicGroupCount">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#bondCount">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#bpol">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#carbonTypes">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#chiChain">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#chiCluster">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#chiPath">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#chiPathCluster">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#eccentricConnectivityIndex">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#fmf">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#gravitationalIndex">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#hBondDonors">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#hBondacceptors">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#hybratio">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#ip">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#kierHallSmarts">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#kierValues">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#largestChain">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#largestPiSystem">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#lengthOverBreadth">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#lipinskifailures">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#longestAliphaticChain">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#mannholdLogP">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#mde">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#momentOfInertia">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#petitjeanNumber">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#petitjeanShapeIndex">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#rotatableBondsCount">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#tpsa">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#vAdjMa">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#vabc">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#weight">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#weightedPath">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#wienerNumbers">
+            <selected>false</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#xlogP">
+            <selected>true</selected>
+        </descriptor>
+        <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#zagrebIndex">
+            <selected>false</selected>
+        </descriptor>
+    </descriptorList>
+</CDKDescUISettings>
