@@ -1,4 +1,4 @@
-""" Molecular descriptors using openbabel. """
+""" Molecular descriptors using openbabel. Author: Santi. Slightly modified by Flo."""
 import pybel
 import numpy
 
@@ -12,14 +12,19 @@ def spectrophores(mols):
     specs = []
     for mol in mols:
         try:
-            specs.append(spectromaker.GetSpectrophore(mol.OBMol))
+            spec = spectromaker.GetSpectrophore(mol.OBMol)
+            spec = list(spec)
+            spec.insert(0, mol.title)
+            spec = tuple(spec)
+            specs.append(spec)
         except Exception, e:
             print 'failed to compute the spectrophore for mol %s' % mol.title
             print e
 
     #Check if any spectrophore computation failed and if so fill the corresponding vector with NaNs
     for i, spec in enumerate(specs):
-        if not len(spec):
-            specs[i] = [float('NaN')] * 48
+        if len(spec) ==1:
+            specs[i][1:] = [float('NaN')] * 48
 
     return numpy.array(specs)
+

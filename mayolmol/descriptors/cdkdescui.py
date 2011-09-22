@@ -1,3 +1,5 @@
+#Author: Santi. Slightly modified by Flo
+from __future__ import with_statement
 import subprocess
 from mayolmol.others import othersoft
 
