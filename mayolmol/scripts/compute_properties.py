@@ -43,18 +43,18 @@ def spectrophores(dataset, overwrite=True):
 if __name__ == '__main__':
     #CDKDescUI based properties
     #CDK_DEFAULT_TYPES = ['constitutional', 'geometric']
-    #CDK_DEFAULT_DESCRIPTORS = op.join(op.split(__file__)[0], "../data/GuhaDescriptors")
-    #CDK_DEFAULT_FINGERPRINTS = ['maccs', 'estate', 'extended']
+    CDK_DEFAULT_DESCRIPTORS = op.join(op.split(__file__)[0], "../data/GuhaDescriptors")
+    CDK_DEFAULT_FINGERPRINTS = ['maccs', 'estate', 'extended']
     dataset = sys.argv[1]
-    #print 'Computing properties for %s' % dataset
-    #cdkdescui.CDKDescUIDriver().compute_selection(dataset,
-                                                     #op.splitext(dataset)[0] + '-cdk' + '.csv',
-                                                     #CDK_DEFAULT_DESCRIPTORS,
-                                                     #addH=True)
-    #for fingerprint in CDK_DEFAULT_FINGERPRINTS:
-        #print '\t' + fingerprint
-        #cdkdescui.CDKDescUIDriver('java', "/mmb/pluto/fmontanari/Build/CDKDescUI.jar").compute_fingerprint(dataset,
-                                                            #op.splitext(dataset)[0] + '-cdk-' + fingerprint + '.csv',
-                                                            #fingerprint=fingerprint,
-                                                            #addH=True)
+    print 'Computing properties for %s' % dataset
+    cdkdescui.CDKDescUIDriver().compute_selection(dataset,
+                                                     op.splitext(dataset)[0] + '-cdk' + '.csv',
+                                                     CDK_DEFAULT_DESCRIPTORS,
+                                                     addH=True)
+    for fingerprint in CDK_DEFAULT_FINGERPRINTS:
+        print '\t' + fingerprint
+        cdkdescui.CDKDescUIDriver('java', "/mmb/pluto/fmontanari/Build/CDKDescUI.jar").compute_fingerprint(dataset,
+                                                            op.splitext(dataset)[0] + '-cdk-' + fingerprint + '.csv',
+                                                            fingerprint=fingerprint,
+                                                            addH=True)
     spectrophores(dataset)
