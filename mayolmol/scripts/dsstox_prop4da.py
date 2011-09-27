@@ -9,12 +9,12 @@ import numpy as np
 from mayolmol.mlmusings import mlio
 from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
 
-def infer_classes(y):
+def infer_classes(y, max_distinct=10):
     """ Return the present classes in y or None if this is a regression problem.
         Just for the DSSToX data.
     """
     yunique = np.unique(y)
-    if len(yunique) > 10:
+    if len(yunique) > max_distinct:
         return None
     return sorted(yunique)
 
@@ -63,18 +63,8 @@ def prop4da(dataset):
     y = read_y_from_master(masterfile)
     classes = infer_classes(y)
 
-    #Process ob spectrophores
-    specs = op.join(root, name + '-ob-spectrophores.csv')
-    with open(specs) as reader:
-        specs = []
-        for line in reader:
-            specs.append(map(lambda a: float(a.strip()), line.split(',')))
-        x = np.array(specs)
-    mlio.save_arff(x, y, op.join(root, name + '-ob-spectrophores.arff'), classes=classes)
-    mlio.save_tab(x, y, op.join(root, name + '-ob-spectrophores.txt'), classes=classes)
-
     #Process CDK descriptors
-    for descs in glob.glob(op.join(root, dataset, '*-cdk-*.csv')):
+    for descs in glob.glob(op.join(root, '*-cdk-*.csv')):
         with open(descs) as reader:
             header = reader.next()
             if header.startswith('Title'):
@@ -83,8 +73,20 @@ def prop4da(dataset):
                 mlio.save_tab(x, y, op.splitext(descs)[0] + '.txt', classes=classes)
             else:
                 x, name = cdkdeskuifps2dense(descs)
-                mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', relation_name=name, classes=classes)
+                features = mlio.generate_names(x.shape[0], descs)
+                mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', relation_name=name, classes=classes, feature_names=features)
                 mlio.save_tab(x, y, op.splitext(descs)[0] + '.txt', classes=classes)
+
+    #Process ob spectrophores
+    specs = op.join(root, name + '-ob-spectrophores.csv')
+    with open(specs) as reader:
+        specs = []
+        for line in reader:
+            specs.append(map(lambda a: float(a.strip()), line.split(',')))
+        x = np.array(specs)
+    feature_names = mlio.generate_names(len(specs[0]))
+    mlio.save_arff(x, y, op.join(root, name + '-ob-spectrophores.arff'), classes=classes, feature_names=feature_names)
+    mlio.save_tab(x, y, op.join(root, name + '-ob-spectrophores.txt'), classes=classes)
 
 if __name__ == '__main__':
     root = DEFAULT_DSSTOX_DIR

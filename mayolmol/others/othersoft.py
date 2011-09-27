@@ -11,6 +11,7 @@ class OtherSoft():
     SALIVIEWER_JAR_URL = 'http://sali.rguha.net/sali.jar'
     UBIGRAPH_UBUNTU_URL = 'http://ubietylab.net/files/alpha-0.2.4/UbiGraph-alpha-0.2.4-Linux64-Ubuntu-8.04.tgz'
     JCOMPOUNDMAPPER_JAR_URL = 'http://dfn.dl.sourceforge.net/project/jcompoundmapper/jCMapperCLI.jar'
+    WEKA_JAR_URL = 'http://heanet.dl.sourceforge.net/project/weka/weka-3-7/3.7.4/weka-3-7-4.zip'
 
     @staticmethod
     def install_ubigraph(root):
@@ -21,6 +22,18 @@ class OtherSoft():
         downloaded, _ = urllib.urlretrieve(OtherSoft.UBIGRAPH_UBUNTU_URL,
                                            op.join(root, 'UbiGraph-alpha-0.2.4-Linux64-Ubuntu-8.04.tgz'))
         extract(downloaded, root)
+        os.remove(downloaded)
+
+    @staticmethod
+    def install_weka(root):
+        print 'Installing weka'
+        root = op.join(root, 'weka')
+        if not op.exists(root):
+            os.makedirs(root)
+        downloaded, _ = urllib.urlretrieve(OtherSoft.WEKA_JAR_URL,
+                                           op.join(root, 'weka-3.7.4.zip'))
+        from zipfile import ZipFile
+        ZipFile(downloaded).extractall(path=root)
         os.remove(downloaded)
 
     @staticmethod
@@ -46,5 +59,8 @@ class OtherSoft():
 
         self.jcompoundmapper = op.join(root, 'jcompoundmapper', 'jcompoundmapper.jar')
         OtherSoft.install_file(OtherSoft.JCOMPOUNDMAPPER_JAR_URL, self.jcompoundmapper)
+
+        self.weka = op.join(self.root, 'weka', 'weka-3-7-4', 'weka.jar')
+        if not op.exists(self.weka): OtherSoft.install_weka(self.root)
 
 OtherSoft()

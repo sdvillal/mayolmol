@@ -20,7 +20,6 @@ def prepare_dataset(sdffile, dest=None, overwrite=False):
        - Save "master" and "saliviewer" tables
        - Redirects stdout/stderr to a "prepare.log" file
     """
-
     root, name = op.split(sdffile)
     name = op.splitext(name)[0]
 

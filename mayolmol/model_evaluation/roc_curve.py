@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import subprocess
 import os.path as op
-import time
+
+#Why don't we use the CROC API?
 
 def prepare_input(directory, input_file, scoredlabel_file):
     #input file will be a 3-columns file with ID, score (between 0 and 1) and label (the real value, 0 for negative and 1 for positive)
@@ -28,8 +29,5 @@ def compute_auc(directory, curve_file):
     r.close()
     return auc.rstrip("\n")
     
-def compute_enrichment()
-        
-    
-        
-    
+def compute_enrichment():
+    pass
