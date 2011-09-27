@@ -8,8 +8,15 @@ import time
 import gtk
 import gobject
 import numpy
-from mayolmol.mlmusings import neighbors
+from mayolmol.mlmusings import neighbors, mlio
 from mayolmol.others import ubigraph, gtkpoc, othersoft
+
+def default_class_to_color(clazz):
+    COLORS = ["#ff0000", #Red
+              "#ffff00", #Yellow
+              "#00ff00", #Green
+              "#0000ff"] #Blue
+    return COLORS[int(clazz)]
 
 class UbigraphHelper():
     def __init__(self, U=None, callback_port=None):
@@ -57,7 +64,7 @@ def chem_ubigraph(x, y, pics=glob.glob('/home/santi/Proyectos/bsc/data/filtering
         return 0
     port = random.randint(20739, 20999)
     U = UbigraphHelper(callback_port=port)
-    U.populate(neighbors.nns(x), y)
+    U.populate(neighbors.nns(x), y, class_to_color=default_class_to_color)
     server = SimpleXMLRPCServer(("localhost", port))
     server.register_introspection_functions()
     server.register_function(vertex_callback, 'vertex_callback')
@@ -73,7 +80,7 @@ def random_problem(num_points=800, dimensionality=30):
     y = [0] * (num_points / 2) + [1] * (num_points - (num_points / 2))
     return x, y
 
-def dsstox_problem(name='BCF'):
+def dsstox_problem(name='Mutagenicity'):
     root = op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'dsstox', name)
     x = numpy.loadtxt(op.join(root, name +'-ob-spectrophores.csv'), delimiter=',')
     with open(op.join(root, name +'-master.csv')) as master:
@@ -83,5 +90,15 @@ def dsstox_problem(name='BCF'):
     pics = glob.glob(op.join(root, 'depictions', '*.png'))
     return x, y, pics
 
-x, y, pics = dsstox_problem()
+def generic_problem(arfffile=op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'mutagenicity', 'all', 'mutagenicity-all-union-prepared-cdk-constitutional.arff')):
+    _, _, _, x, y = mlio.load_arff(arfffile)
+    root, _ = op.split(arfffile)
+    pics = glob.glob(op.join(root, 'depictions', '*.png'))
+    return x, y, pics
+
+def linear_gradient(num_colors, num_color, start=0, end=255):
+    return (end - start) * num_color / num_colors
+
+#x, y, pics = dsstox_problem()
+x, y, pics = generic_problem()
 chem_ubigraph(x, y, pics)

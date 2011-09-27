@@ -4,6 +4,8 @@ import os.path as op
 import time
 import croc
 
+#Why don't we use the CROC API? -> we do now.
+
 def prepare_input(directory, input_file, scoredlabel_file):
     #input file will be a 3-columns file with ID, score (between 0 and 1) and label (the real value, 0 for negative and 1 for positive)
     f = open(op.join(directory, input_file), 'r')
@@ -50,4 +52,4 @@ def compute_enrichment(directory, scoredlabel_file, curve_file):
 #print compute_enrichment("/mmb/pluto/fmontanari/Escritorio/testCROC","input.scored-label", "enrichment.curve")        
     
         
-    
+

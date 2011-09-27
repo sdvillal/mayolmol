@@ -18,7 +18,7 @@ def load_arff(src):
         No support for sparsity, string, nominal or date attributes, missing values,
         weights, comments and other goodies, no error checking, but this will do for the moment.
         There are many alternatives, the only one that does not add dependencies is
-        scipy's arffloader, but it is quite buggy.
+        scipy's arffloader, but it is quite buggy at the moment.
     """
     name = None
     attributes = []
@@ -64,9 +64,10 @@ def save_tab(x, y, dest, format='%.8g', classes=None):
         row += [y[i]]
         writer.writerow(row)
 
-def save_arff(x, y, dest, relation_name='Unknown', feature_names=None, format='%.8g', classes=None):
+def save_arff(x, y, dest, relation_name=None, feature_names=None, format='%.8g', classes=None):
     ne, nf = x.shape
     if not feature_names: feature_names = generate_names(nf)
+    if not relation_name: relation_name = op.splitext(op.split(dest)[1])[0]
     with open(dest, 'w') as dest:
         dest.write('@relation ' + relation_name + '\n\n')
         for fName in feature_names:
