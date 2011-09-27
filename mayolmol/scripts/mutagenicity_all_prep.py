@@ -106,11 +106,6 @@ if __name__ == '__main__':
 
     root = op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'mutagenicity', 'all')
 
-    dest_sdf = op.join(root, 'mutagenicity-all-union-prepared.sdf')
-
-    print 'Saving in several data analysis tools file formats'
-    prop4da(dest_sdf)
-
     print 'Merging the datasets'
 
     ames_original = op.join(root, 'ames.sdf')
@@ -159,6 +154,8 @@ if __name__ == '__main__':
     cdkdescuiprops(dest_sdf, desc_types=('constitutional,'))
     print 'Computing spectrophores'
     spectrophores(dest_sdf)
+    print 'Saving in several data analysis tools file formats'
+    prop4da(dest_sdf)
     print 'Computing fingerprints via JCompoundMapper' #TODO: Extract-method this
     FINGERPRINTS = ('ECFP', 'CATS2D', 'PHAP3POINT2D', 'DFS', 'RAD2D')
     for fp in FINGERPRINTS:
