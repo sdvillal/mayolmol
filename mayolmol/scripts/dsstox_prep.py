@@ -10,6 +10,7 @@ Others:
 
 TODO: log per-dataset info
 """
+from __future__ import with_statement
 import multiprocessing
 import os.path as op
 import os

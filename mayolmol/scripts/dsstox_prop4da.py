@@ -2,12 +2,13 @@
  Some data transformations to allow easy read of the properties in data analysis tools
  like weka or orange.
 """
+from __future__ import with_statement
 import glob
 import os
 import os.path as op
 import numpy as np
 from mayolmol.mlmusings import mlio
-from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
+#from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
 
 def infer_classes(y, max_distinct=10):
     """ Return the present classes in y or None if this is a regression problem.
@@ -88,13 +89,30 @@ def prop4da(dataset):
     mlio.save_arff(x, y, op.join(root, name + '-ob-spectrophores.arff'), classes=classes, feature_names=feature_names)
     mlio.save_tab(x, y, op.join(root, name + '-ob-spectrophores.txt'), classes=classes)
 
-if __name__ == '__main__':
-    root = DEFAULT_DSSTOX_DIR
-    datasets = sorted([name for name in os.listdir(root) if op.isdir(op.join(root, name))])
+def spectrophores_to_arff(directory, master_file, spec_csv, to_predict):
+    y = read_y_from_master(op.join(directory,master_file))
+    classes = infer_classes(y)
+    specs = op.join(directory, spec_csv)
+    f = open(specs, 'r')
+    data = []
+    for line in f:
+        data.append(map(lambda a: float(a.strip()), line.split(',')))
+    x = np.array(specs)    
+    feature_names = ['ID']
+    for i in range(48):
+        feature_names.append('Spec'+str(i))
+    relation_name = to_predict
+    arff_file = op.join(directory, op.splitext(spec_csv)[0])
+    mlio.save_arff(x, y, arff_file, relation_name=relation_name, feature_names=feature_names, classes=classes)
 
-    for dataset in datasets:
-        print dataset
-        prop4da(dataset)
+if __name__ == '__main__':
+    #root = DEFAULT_DSSTOX_DIR
+    #datasets = sorted([name for name in os.listdir(root) if op.isdir(op.join(root, name))])
+
+    #for dataset in datasets:
+        #print dataset
+        #prop4da(dataset)
+    spectrophores_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-ob-spectrophores.csv", "tPSA")
 
 #TODO: Save the compound ID too
 #TODO: be robust to failed description computation

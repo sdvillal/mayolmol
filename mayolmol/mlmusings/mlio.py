@@ -3,6 +3,7 @@
     mldata-utils, arff, orange and the like could be useful here.
     Requires python >= 2.6
 """
+from __future__ import with_statement
 import os.path as op
 import shlex
 import csv
@@ -65,6 +66,7 @@ def save_tab(x, y, dest, format='%.8g', classes=None):
         writer.writerow(row)
 
 def save_arff(x, y, dest, relation_name=None, feature_names=None, format='%.8g', classes=None):
+    #x is the matrix of (instances*descriptors) and y is the vector of classes. The attributes values are reals here.
     ne, nf = x.shape
     if not feature_names: feature_names = generate_names(nf)
     if not relation_name: relation_name = op.splitext(op.split(dest)[1])[0]
