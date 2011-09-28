@@ -14,7 +14,7 @@ class WekaCLIDriver():
     def sparse2dense(self, sparse, dense=None):
         """ Save an sparse ARFF file as dense. """
 
-        if not dense: dense = op.splitext(sparse) +'-dense.arff'
+        if not dense: dense = op.splitext(sparse)[0] +'-dense.arff'
 
         filter_class = ' weka.filters.unsupervised.instance.SparseToNonSparse'
 

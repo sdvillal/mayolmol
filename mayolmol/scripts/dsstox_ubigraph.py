@@ -12,9 +12,9 @@ from mayolmol.mlmusings import neighbors, mlio
 from mayolmol.others import ubigraph, gtkpoc, othersoft
 
 def default_class_to_color(clazz):
-    COLORS = ["#ff0000", #Red
+    COLORS = ["#00ff00", #Green
+              "#ff0000", #Red
               "#ffff00", #Yellow
-              "#00ff00", #Green
               "#0000ff"] #Blue
     return COLORS[int(clazz)]
 
@@ -90,7 +90,7 @@ def dsstox_problem(name='Mutagenicity'):
     pics = glob.glob(op.join(root, 'depictions', '*.png'))
     return x, y, pics
 
-def generic_problem(arfffile=op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'mutagenicity', 'all', 'mutagenicity-all-union-prepared-cdk-constitutional.arff')):
+def generic_problem(arfffile=op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'mutagenicity', 'all', 'mutagenicity-all-cas-union-prepared-jcm-ECFP-dense.arff')):
     _, _, _, x, y = mlio.load_arff(arfffile)
     root, _ = op.split(arfffile)
     pics = glob.glob(op.join(root, 'depictions', '*.png'))

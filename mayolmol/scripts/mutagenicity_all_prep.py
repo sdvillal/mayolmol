@@ -4,6 +4,7 @@ import os
 import os.path as op
 import pybel
 from mayolmol.descriptors.jcompoundmapper import JCompoundMapperCLIDriver
+from mayolmol.others.wekacli import WekaCLIDriver
 from mayolmol.scripts.dsstox_depict import depict
 from mayolmol.scripts.dsstox_prep import create_saliviewer_input, create_master_table, save_mols, rename_mols_by_index
 from mayolmol.scripts.dsstox_prop4da import prop4da
@@ -16,39 +17,40 @@ def aid2sdf(sdf, csv, dest=None):
     for activity in open(csv).readlines()[1:]:
         value = activity.split(',')[5]
         molid = activity.split(',')[2]
-        activities[molid] = value    
-    #Save the activity to each molecule    
+        activities[molid] = value
+        #Save the activity to each molecule
     mols = list(pybel.readfile('sdf', sdf))
-    for mol in mols:        
+    for mol in mols:
         activity = activities[mol.title]
         if activity == 'Active': actual_activity = '1'
         elif activity == 'Inactive': actual_activity = '0'
         else: actual_activity = 'Missing'
         mol.data['Activity'] = actual_activity
-    if dest: 
-        save_mols(mols, dest)        
+    if dest:
+        save_mols(mols, dest)
     return mols
-    
-def merge(mols1, mols2):
-    """ Merge two collections of molecules.
-        It returns the union, the interesction and the ambiguous pairs
-        (same molecule with different outcomes).
-    """
-    present_can_smiles = {}
-    intersection = []
-    union = []
-    ambiguous = []
-    for mol in mols1 + mols2:
-        can = mol.write('can').split()[0]
-        if not can in present_can_smiles:
-            present_can_smiles[can] = mol
-            union.append(mol)
+
+def duplicates_by_format(mols, format='inchi'):
+    #TODO: a function "duplicates taking" a lambda to extract the key
+    merged = {}
+    for mol in mols:
+        id = mol.write(format)
+        if not id in merged:
+            merged[id] = [mol]
         else:
-            intersection.append(mol)
-            present_mol = present_can_smiles[can]
-            if mol.data['Activity'] != present_mol.data['Activity']:
-                ambiguous+=(present_mol, mol)
-    return union, intersection, ambiguous
+            merged[id].append(mol)
+    return merged
+
+def duplicates_by_field(mols, field='CAS_NO'):
+    #TODO: a function "duplicates taking" a lambda to extract the key
+    merged = {}
+    for mol in mols:
+        id = mol.data[field]
+        if not id in merged:
+            merged[id] = [mol]
+        else:
+            merged[id].append(mol)
+    return merged
 
 def prepare_dataset(sdffile, dest=None, rename=True, conformations=False, overwrite=False):
     """ This method bootstraps the analysis of Ames data.
@@ -84,7 +86,7 @@ def prepare_dataset(sdffile, dest=None, rename=True, conformations=False, overwr
         if conformations:
             print '\tGenerating conformations'
             for mol in mols:
-                if not any(name in mol.title for name in ('train-3988', 'train-4205')):
+                if not any(name in mol.title for name in ('train-3988', 'train-4205', 'dsstox-4205', 'dsstox-4206')):
                     try:
                         print 'Conformation for %s' % mol.title
                         mol.make3D()
@@ -102,8 +104,17 @@ def prepare_dataset(sdffile, dest=None, rename=True, conformations=False, overwr
 
     return dest_sdf, master_table
 
-if __name__ == '__main__':
+def jcm_fingerprint(sdf, fingerprints, label='Activity', hash_space_size=2**10, as_dense_too=True):
+    #TODO: use multiprocessing
+    for fp in fingerprints:
+        print '\t' + fp
+        output = op.splitext(sdf)[0] + '-jcm-' + fp + '.arff'
+        JCompoundMapperCLIDriver().fingerprint(sdf, output, fingerprint=fp, label=label,
+                                               hash_space_size=hash_space_size)
+        if as_dense_too:
+            WekaCLIDriver().sparse2dense(output)
 
+if __name__ == '__main__':
     root = op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'mutagenicity', 'all')
 
     print 'Merging the datasets'
@@ -117,51 +128,43 @@ if __name__ == '__main__':
     mols_bursi = list(pybel.readfile('sdf', bursi_original))
     mols_dsstox = list(pybel.readfile('sdf', dsstox_original))
 
+    print 'Num molecules ames=%d, bursi=%d, dsstox=%d' % (len(mols_ames), len(mols_bursi), len(mols_dsstox))
+
     #The activity is always stored in the same field
     for mol in mols_bursi:
         activity = '1' if mol.data['Ames test categorisation'] == 'mutagen' else '0'
         mol.data['Activity'] = activity
+        mol.data['CAS_NO'] = mol.title
 
     for mol in mols_dsstox:
         mol.data['Activity'] = mol.data['Tox']
+        mol.data['CAS_NO'] = mol.data['CAS']
 
     print '\tRenaming the compounds to keep track of the provenance'
     rename_mols_by_index(mols_ames, 'ames-')
     rename_mols_by_index(mols_bursi, 'bursi-')
     rename_mols_by_index(mols_dsstox, 'dsstox-')
 
-#    aid1189csv = '1189aid.csv'
-#    aid1189sdf = 'AID1189.sdf'
-#    aid1194csv = '1194aid.csv'
-#    aid1194sdf = 'AID1194.sdf'
-#    aid1189mols = aid2sdf(aid1189sdf, aid1189csv, 'aid1189-prepared.sdf')
-#    aid1194mols = aid2sdf(aid1194sdf, aid1194csv, 'aid1194-prepared.sdf')
+    print '\tComputing and analyzing the union of the datasets'
+    cas_dupes = duplicates_by_field(mols_ames + mols_bursi + mols_dsstox)
+    #inchi_dupes = duplicates_by_format(mols_ames + mols_bursi + mols_dsstox,)
+    #can_dupes = duplicates_by_format(mols_ames + mols_bursi + mols_dsstox, 'can')
+    union = sorted([dupe[0] for dupe in cas_dupes.values()], key=lambda mol: mol.title)
+    save_mols(union, op.join(root, 'mutagenicity-all-cas-union.sdf'))
+    print '\t\tUnion size=%d' % len(union)
 
-    print '\tComputing the union of the datasets'
-    union, intersection, ambiguous = merge(mols_ames, mols_bursi + mols_dsstox)
-    save_mols(union, op.join(root, 'mutagenicity-all-union.sdf'))
-    save_mols(intersection, op.join(root, 'mutagenicity-all-intersection.sdf'))
-    save_mols(ambiguous, op.join(root, 'mutagenicity-all-ambiguous.sdf'))
-    print '\t\tUnion size=%d, Intersection size=%d, Ambiguous size=%d'%(len(union), len(intersection), len(ambiguous))
-
-    dest_sdf, _ = prepare_dataset(op.join(root, 'mutagenicity-all-union.sdf'), rename=False, conformations=True)
+    dest_sdf = op.join(root, 'mutagenicity-all-cas-union-prepared.sdf')
+    prepare_dataset(op.join(root, 'mutagenicity-all-cas-union.sdf'), rename=False, conformations=True)
 
     #Depict the molecules
     depict(dest_sdf)
 
     #Molecular descriptors
     print 'Computing descriptors via CDKDescUI'
-    cdkdescuiprops(dest_sdf, desc_types=('constitutional,'))
+    cdkdescuiprops(dest_sdf, desc_types=('constitutional',))
     print 'Computing spectrophores'
     spectrophores(dest_sdf)
     print 'Saving in several data analysis tools file formats'
     prop4da(dest_sdf)
     print 'Computing fingerprints via JCompoundMapper' #TODO: Extract-method this
-    FINGERPRINTS = ('ECFP', 'CATS2D', 'PHAP3POINT2D', 'DFS', 'RAD2D')
-    for fp in FINGERPRINTS:
-        print fp
-        output = op.join(root, 'mutagenicity-all-union-jcm-' +fp +'.arff')
-        JCompoundMapperCLIDriver().fingerprint(dest_sdf, output, label='Activity', hash_space_size=2**10)
-        #TODO: sparse to non-sparse
-        #Use http://weka.sourceforge.net/doc.dev/weka/filters/unsupervised/instance/SparseToNonSparse.html
-        #java -cp weka.jar weka.filters.unsupervised.instance.SparseToNonSparse -i sparse.arrf -o dense.arff -c last
+    jcm_fingerprint(dest_sdf, ('ECFP', 'ECFPVariant', 'PHAP3POINT2D', 'SHED', 'DFS', 'RAD2D'))
