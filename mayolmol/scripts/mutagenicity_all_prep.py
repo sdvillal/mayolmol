@@ -154,14 +154,14 @@ if __name__ == '__main__':
     print '\t\tUnion size=%d' % len(union)
 
     dest_sdf = op.join(root, 'mutagenicity-all-cas-union-prepared.sdf')
-    prepare_dataset(op.join(root, 'mutagenicity-all-cas-union.sdf'), rename=False, conformations=True)
+#    prepare_dataset(op.join(root, 'mutagenicity-all-cas-union.sdf'), rename=False, conformations=True)
 
     #Depict the molecules
-    depict(dest_sdf)
+#    depict(dest_sdf)
 
     #Molecular descriptors
-    print 'Computing descriptors via CDKDescUI'
-    cdkdescuiprops(dest_sdf, desc_types=('constitutional',))
+#    print 'Computing descriptors via CDKDescUI'
+#    cdkdescuiprops(dest_sdf, desc_types=('constitutional',))
     print 'Computing spectrophores'
     spectrophores(dest_sdf)
     print 'Saving in several data analysis tools file formats'

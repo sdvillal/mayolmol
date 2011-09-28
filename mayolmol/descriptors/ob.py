@@ -11,14 +11,15 @@ def spectrophores(mols):
     spectromaker = pybel.ob.OBSpectrophore()
     specs = []
     for mol in mols:
+        print mol.title
         try:
-            if len(mol.atoms) <= 2:
+            if len(mol.atoms) > 2:
                 spec = spectromaker.GetSpectrophore(mol.OBMol)
                 spec = list(spec)
                 spec.insert(0, mol.title)
                 spec = tuple(spec)
             else:
-                spec=('nan',)
+                spec=(mol.title,)
             specs.append(spec)
         except Exception, e:
             print 'failed to compute the spectrophore for mol %s' % mol.title
