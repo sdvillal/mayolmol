@@ -159,12 +159,11 @@ if __name__ == '__main__':
     #Depict the molecules
 #    depict(dest_sdf)
 
-    #Molecular descriptors
+    print 'Computing fingerprints via JCompoundMapper' #TODO: Extract-method this
+    jcm_fingerprint(dest_sdf, ('ECFP', 'ECFPVariant', 'PHAP3POINT2D', 'SHED', 'DFS', 'RAD2D'))    #Molecular descriptors
 #    print 'Computing descriptors via CDKDescUI'
 #    cdkdescuiprops(dest_sdf, desc_types=('constitutional',))
     print 'Computing spectrophores'
     spectrophores(dest_sdf)
     print 'Saving in several data analysis tools file formats'
     prop4da(dest_sdf)
-    print 'Computing fingerprints via JCompoundMapper' #TODO: Extract-method this
-    jcm_fingerprint(dest_sdf, ('ECFP', 'ECFPVariant', 'PHAP3POINT2D', 'SHED', 'DFS', 'RAD2D'))
