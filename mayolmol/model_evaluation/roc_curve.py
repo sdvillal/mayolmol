@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import subprocess
 import os.path as op
+import os
 import time
 import croc
 import sys
@@ -55,8 +56,9 @@ def compute_enrichment(directory, scoredlabel_file, curve_file):
 #print compute_enrichment("/mmb/pluto/fmontanari/Escritorio/testCROC","input.scored-label", "enrichment.curve")    
 
 def write_GNUplot_file(curve_type, directory, curve_file, params_file, image_file=None):
-    assert curve_type in ("roc", "enrichment")
-    #TODO: check of file. Delete any existing one
+    if op.exists(op.join(directory, params_file)):
+        os.remove(op.join(directory, params_file))
+        print "Removing existing drawing parameters file."
     f = open(op.join(directory,params_file), 'a')
     f.write("cd '" + directory + "'\n")
     if image_file:
@@ -83,16 +85,20 @@ if __name__ == "__main__":
     #print depict("/mmb/pluto/fmontanari/Escritorio/testCROC", "enrichment", "enrichment.curve", "gnuplot.gp", "nicePlot.png")
     #print write_GNUplot_file("roc", "/mmb/pluto/fmontanari/Escritorio/testCROC", "coordinates.curve", "gnuplot.gp")
     #TODO: check input parameters
-    directory = sys.argv[1]
-    prediction_file = sys.argv[2]
-    model_name = sys.argv[3]
+    if len(sys.argv) == 4:
+        directory = sys.argv[1]
+        prediction_file = sys.argv[2]
+        if not op.exists(op.join(directory, prediction_file)):
+            print "There is not such file: %s"%op.join(directory, prediction_file)
+            sys.exit()
+        model_name = sys.argv[3]
     
     #TODO checks of file and directory
-    prepare_input(directory, prediction_file, model_name + ".scored-label")
-    compute_curve(directory, model_name + ".scored-label", model_name + ".roc")
-    compute_enrichment(directory, model_name + ".scored-label", model_name + ".enrich")
-    auc = compute_auc_with_API(directory, model_name + ".roc")
-    depict(directory, "roc", model_name + ".roc", "params" + "_" + model_name + "_roc.gp", model_name + "_rocplot.png")
-    depict(directory, "enrichment", model_name + ".enrich", "params" + "_" + model_name + "_enrich.gp", model_name + "_enrichplot.png")
-    
-    
+        prepare_input(directory, prediction_file, model_name + ".scored-label")
+        compute_curve(directory, model_name + ".scored-label", model_name + ".roc")
+        compute_enrichment(directory, model_name + ".scored-label", model_name + ".enrich")
+        auc = compute_auc_with_API(directory, model_name + ".roc")
+        depict(directory, "roc", model_name + ".roc", "params" + "_" + model_name + "_roc.gp", model_name + "_rocplot.png")
+        depict(directory, "enrichment", model_name + ".enrich", "params" + "_" + model_name + "_enrich.gp", model_name + "_enrichplot.png")
+    else:
+        print "Too many or too little arguments. Please remember:\n -1st argument is the directory where your model output is stored\n -2nd argument is the name of the prediction file\n -3rd argument is the name you want to give to your model."
