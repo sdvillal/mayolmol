@@ -88,12 +88,11 @@ if __name__ == "__main__":
     model_name = sys.argv[3]
     
     #TODO checks of file and directory
-    scoredlabel_file = prepare_input(directory, prediction_file, model_name + ".scored-label")
-    compute_curve(directory, scoredlabel_file, model_name + ".roc")
-    compute_enrichment(directory, scoredlabel_file, model_name + ".enrich")
+    prepare_input(directory, prediction_file, model_name + ".scored-label")
+    compute_curve(directory, model_name + ".scored-label", model_name + ".roc")
+    compute_enrichment(directory, model_name + ".scored-label", model_name + ".enrich")
     auc = compute_auc_with_API(directory, model_name + ".roc")
-    print "The Area Under the ROC is %.4f"%auc
-    depict(directory, "roc", model_name + ".roc", params + "_" + model_name + "_roc.gp", model_name + "_rocplot.png")
-    depict(directory, "enrichment", model_name + ".enrich", params + "_" + model_name + "_enrich.gp", model_name + "_enrichplot.png")
+    depict(directory, "roc", model_name + ".roc", "params" + "_" + model_name + "_roc.gp", model_name + "_rocplot.png")
+    depict(directory, "enrichment", model_name + ".enrich", "params" + "_" + model_name + "_enrich.gp", model_name + "_enrichplot.png")
     
     
