@@ -11,15 +11,11 @@ def spectrophores(mols):
     spectromaker = pybel.ob.OBSpectrophore()
     specs = []
     for mol in mols:
-        print mol.title
         try:
-            if len(mol.atoms) > 2:
-                spec = spectromaker.GetSpectrophore(mol.OBMol)
-                spec = list(spec)
-                spec.insert(0, mol.title)
-                spec = tuple(spec)
-            else:
-                spec=(mol.title,)
+            spec = spectromaker.GetSpectrophore(mol.OBMol)
+            spec = list(spec)
+            spec.insert(0, mol.title)
+            spec = tuple(spec)
             specs.append(spec)
         except Exception, e:
             print 'failed to compute the spectrophore for mol %s' % mol.title
@@ -34,3 +30,24 @@ def spectrophores(mols):
     for i in xrange(48):
         a.append(('spec_' + str(i) , '<f8'))
     return numpy.array(specs, dtype=a)
+
+def spectrophores_old(mols):
+    """
+    Compute the spectrophores of the molecules and return a numpy array.
+    We use default settings for the spectrophores.
+    """
+    spectromaker = pybel.ob.OBSpectrophore()
+    specs = []
+    for mol in mols:
+        try:
+            specs.append(spectromaker.GetSpectrophore(mol.OBMol))
+        except Exception, e:
+            print 'failed to compute the spectrophore for mol %s' % mol.title
+            print e
+
+    #Check if any spectrophore computation failed and if so fill the corresponding vector with NaNs
+    for i, spec in enumerate(specs):
+        if not len(spec):
+            specs[i] = [float('NaN')] * 48
+
+    return numpy.array(specs)
