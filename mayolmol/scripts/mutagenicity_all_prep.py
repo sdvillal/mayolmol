@@ -34,7 +34,7 @@ def duplicates_by_format(mols, format='inchi'):
     #TODO: a function "duplicates taking" a lambda to extract the key
     merged = {}
     for mol in mols:
-        id = mol.write(format)
+        id = mol.write(format).split()[0]
         if not id in merged:
             merged[id] = [mol]
         else:
@@ -148,7 +148,31 @@ if __name__ == '__main__':
     print '\tComputing and analyzing the union of the datasets'
     cas_dupes = duplicates_by_field(mols_ames + mols_bursi + mols_dsstox)
     #inchi_dupes = duplicates_by_format(mols_ames + mols_bursi + mols_dsstox,)
-    #can_dupes = duplicates_by_format(mols_ames + mols_bursi + mols_dsstox, 'can')
+    can_dupes = duplicates_by_format(mols_ames + mols_bursi + mols_dsstox, 'can')
+
+    #Quick and dirty retrieval of compounds for unit-tests
+    #Canonical smiles that are different due to
+    # - missing hydrogens (report)
+    # - bad perception of stereochemistry
+    # - charges
+    # - ...
+    can_dupes2 = {}
+    for key in can_dupes.keys():
+        data = can_dupes[key]
+        cas = data[0].data['CAS_NO']
+        if not cas in can_dupes2:
+            can_dupes2[cas] = [data]
+        else:
+            can_dupes2[cas].append(data)
+
+    for cas in can_dupes2.keys():
+        groups = can_dupes2[cas]
+        if len(groups) > 1:
+           print 'compound with cas=%s is considered different by OB canonical smiles'%cas
+           for group in groups:
+                print group[0].write('can').strip()
+           print '-'*80
+
     union = sorted([dupe[0] for dupe in cas_dupes.values()], key=lambda mol: mol.title)
     save_mols(union, op.join(root, 'mutagenicity-all-cas-union.sdf'))
     print '\t\tUnion size=%d' % len(union)
