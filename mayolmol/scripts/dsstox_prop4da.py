@@ -74,9 +74,9 @@ def prop4da(dataset):
                 mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', feature_names=features, classes=classes)
                 mlio.save_tab(x, y, op.splitext(descs)[0] + '.txt', classes=classes)
             else:
-                x, name = cdkdeskuifps2dense(descs)
+                x, relation_name = cdkdeskuifps2dense(descs)
                 features = mlio.generate_names(x.shape[0], descs)
-                mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', relation_name=name, classes=classes, feature_names=features)
+                mlio.save_arff(x, y, op.splitext(descs)[0] + '.arff', relation_name=relation_name, classes=classes, feature_names=features)
                 mlio.save_tab(x, y, op.splitext(descs)[0] + '.txt', classes=classes)
 
     #Process ob spectrophores

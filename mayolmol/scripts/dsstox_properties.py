@@ -12,7 +12,7 @@ def spectrophores(dataset):
     """ Compute the spectrophores for a dataset """
     try:
         print '\tSpectrophores'
-        specs = ob.spectrophores(pybel.readfile('sdf', dataset))
+        specs = ob.spectrophores_old(pybel.readfile('sdf', dataset))
         dataset_root, dataset_name = op.split(dataset)
         dataset_name = op.splitext(dataset_name)[0]
         numpy.savetxt(op.join(dataset_root, dataset_name + '-ob-spectrophores.csv'),
@@ -21,7 +21,7 @@ def spectrophores(dataset):
     except Exception, e:
         print 'Damn, there has been a problem computing the pharmacophores...'
         print 'Research into this...'
-        print e.message
+        print e.message, e
 
 def cdkdescuiprops(dataset, desc_types = ('constitutional', 'geometric'), fingerprints=('maccs', 'estate')):
     for desc_type in desc_types:
