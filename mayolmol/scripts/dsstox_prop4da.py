@@ -9,6 +9,7 @@ import os.path as op
 import numpy as np
 from mayolmol.mlmusings import mlio
 #from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
+DEFAULT_DSSTOX_DIR = op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'dsstox')
 
 def infer_classes(y, max_distinct=10):
     """ Return the present classes in y or None if this is a regression problem.
@@ -97,7 +98,7 @@ def spectrophores_to_arff(directory, master_file, spec_csv, to_predict):
     data = []
     for line in f:
         data.append(map(lambda a: float(a.strip()), line.split(',')))
-    x = np.array(specs)    
+    x = np.array(data)   
     feature_names = ['ID']
     for i in range(48):
         feature_names.append('Spec'+str(i))
