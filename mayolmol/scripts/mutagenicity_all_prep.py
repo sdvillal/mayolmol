@@ -154,15 +154,17 @@ if __name__ == '__main__':
     print '\t\tUnion size=%d' % len(union)
 
     dest_sdf = op.join(root, 'mutagenicity-all-cas-union-prepared.sdf')
-#    prepare_dataset(op.join(root, 'mutagenicity-all-cas-union.sdf'), rename=False, conformations=True)
+    prepare_dataset(op.join(root, 'mutagenicity-all-cas-union.sdf'), rename=False, conformations=True)
 
     #Depict the molecules
-#    depict(dest_sdf)
+    depict(dest_sdf)
 
+    #Molecular descriptors
     print 'Computing fingerprints via JCompoundMapper' #TODO: Extract-method this
-    jcm_fingerprint(dest_sdf, ('ECFP', 'ECFPVariant', 'PHAP3POINT2D', 'SHED', 'DFS', 'RAD2D'))    #Molecular descriptors
-#    print 'Computing descriptors via CDKDescUI'
-#    cdkdescuiprops(dest_sdf, desc_types=('constitutional',))
+    jcm_fingerprint(dest_sdf, ('ECFP', 'ECFPVariant', 'PHAP3POINT2D', 'SHED', 'DFS', 'RAD2D'))
+    jcm_fingerprint(dest_sdf, ('LSTAR', 'RAD3D', 'PHAP3POINT3D'))
+    print 'Computing descriptors via CDKDescUI'
+    cdkdescuiprops(dest_sdf, desc_types=('constitutional',))
     print 'Computing spectrophores'
     spectrophores(dest_sdf)
     print 'Saving in several data analysis tools file formats'
