@@ -82,9 +82,9 @@ def save_arff(x, y, dest, relation_name=None, feature_names=None, format='%.8g',
         dest.write('@attribute class ' + classes + '\n')
         dest.write('@data\n')
         for row in xrange(ne):
-            instance = map(lambda a: format % a if not math.isnan(a) else '?', x[row, :])
+            instance = map(lambda a: format % a if not np.isnan(a) else '?', x[row, :])
             dest.write(','.join(instance))
-            dest.write(',' +(str(y[row]) if not math.isnan(y[row]) else '?') + '\n')
+            dest.write(',' +(str(y[row]) if not np.isnan(y[row]) else '?') + '\n')
 
 def mergearffs(dest, arff1, *args):
     if not dest:

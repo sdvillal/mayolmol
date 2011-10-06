@@ -8,8 +8,7 @@ import os
 import os.path as op
 import numpy as np
 from mayolmol.mlmusings import mlio
-#from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
-DEFAULT_DSSTOX_DIR = op.join(op.expanduser('~'), 'Proyectos', 'bsc', 'data', 'filtering', 'dsstox')
+from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
 
 def infer_classes(y, max_distinct=10):
     """ Return the present classes in y or None if this is a regression problem.
@@ -29,21 +28,34 @@ def read_y_from_master(masterfile):
         y = [float(line.split(',')[2]) for line in master]
         return np.array(y)
 
-def cdkdeskuifps2dense(cdkdescui_fpfile, sep=' '):
+def cdkdeskuifps2dense(cdkdescui_fpfile, sep=' ', keep_id = False):
     with open(cdkdescui_fpfile) as src:
         header = src.next()
         name = header.split()[1]
         num_bits = int(header.split()[2])
         x = []
-        for line in src:
-            values_str = line.partition(sep)[2].strip()
-            values_str = values_str.strip()[1:-1].split(',')
-            values = [0] * num_bits
-            if len(values_str) and len(values_str[0]):
-                for bit in map(int, values_str):
-                    values[bit] = 1
-            x.append(values)
-        return np.array(x), name
+        if not keep_id:
+            for line in src:
+                values_str = line.partition(sep)[2].strip()
+                values_str = values_str.strip()[1:-1].split(',')
+                values = [0] * num_bits
+                if len(values_str) and len(values_str[0]):
+                    for bit in map(int, values_str):
+                        values[bit] = 1
+                x.append(values)
+            return np.array(x), name
+        else:
+            for line in src:
+                values_str = line.partition(sep)[2].strip()
+                values_str = values_str.strip()[1:-1].split(',')
+                id = int(line.partition(sep)[0].strip())
+                values = [0] * num_bits
+                if len(values_str) and len(values_str[0]):
+                    for bit in map(int, values_str):
+                        values[bit] = 1
+                values = [id] + values
+                x.append(values)
+            return np.array(x), name
 
 def floatOrNaN(string):
     try:
@@ -98,22 +110,61 @@ def spectrophores_to_arff(directory, master_file, spec_csv, to_predict):
     data = []
     for line in f:
         data.append(map(lambda a: float(a.strip()), line.split(',')))
-    x = np.array(data)   
+    x = np.array(data)
     feature_names = ['ID']
+    f.close()
     for i in range(48):
         feature_names.append('Spec'+str(i))
-    relation_name = to_predict
-    arff_file = op.join(directory, op.splitext(spec_csv)[0])
-    mlio.save_arff(x, y, arff_file, relation_name=relation_name, feature_names=feature_names, classes=classes)
+    arff_file = op.join(directory, op.splitext(spec_csv)[0] + ".arff")
+    mlio.save_arff(x, y, arff_file, relation_name=to_predict, feature_names=feature_names, classes=classes)
 
+def cdk_desc_to_arff(directory, master_file, desc_csv, to_predict):
+    y = read_y_from_master(op.join(directory,master_file))
+    classes = infer_classes(y)
+    descs = op.join(directory, desc_csv)
+    f = open(descs, 'r')
+    data = []
+    line1 = f.readline()
+    feature_names = ["ID"] + [name for name in line1.split()[1:]]
+    for line in f:
+        if len(line.strip()):
+            data.append(map(floatOrNaN, line.strip().split("\t")))        
+    f.close()
+    x = np.array(data[0:-1])
+    arff_file = op.join(directory, op.splitext(desc_csv)[0] + ".arff")
+    mlio.save_arff(x, y, arff_file, relation_name=to_predict, feature_names=feature_names, classes=classes)
+    
+def cdk_fpt_to_arff(directory, master_file, fpt_csv, to_predict, fpt_type):
+    y = read_y_from_master(op.join(directory,master_file))
+    classes = infer_classes(y)    
+    fpts = op.join(directory, fpt_csv)
+    f = open(fpts, 'r')
+    x, _ = cdkdeskuifps2dense(fpts, keep_id=True)
+    feature_names = ['ID']
+    if fpt_type == "maccs":
+        for i in range(166):
+            feature_names.append("maccs" + str(i))
+    elif fpt_type == "estate":
+        for i in range(79):
+            feature_names.append("estate" + str(i))
+    elif fpt_type == "extended":
+        for i in range(1024):
+            feature_names.append("extended" + str(i))
+    else: 
+        print "Fingerprint type currently not supported."
+    arff_file = op.join(directory, op.splitext(fpt_csv)[0] + ".arff")
+    mlio.save_arff(x, y, arff_file, relation_name=to_predict, feature_names=feature_names, classes=classes)
+    
 if __name__ == '__main__':
-    #root = DEFAULT_DSSTOX_DIR
-    #datasets = sorted([name for name in os.listdir(root) if op.isdir(op.join(root, name))])
+    root = DEFAULT_DSSTOX_DIR
+    datasets = sorted([name for name in os.listdir(root) if op.isdir(op.join(root, name))])
 
-    #for dataset in datasets:
-        #print dataset
-        #prop4da(dataset)
-    spectrophores_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-ob-spectrophores.csv", "tPSA")
+    for dataset in datasets:
+        print dataset
+        prop4da(dataset)
+    #spectrophores_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-ob-spectrophores.csv", "tPSA")
+    #cdk_desc_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-cdk.csv", "tPSA")
+    #cdk_fpt_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-cdk-estate.csv", "tPSA", "estate")
 
 #TODO: Save the compound ID too
 #TODO: be robust to failed description computation

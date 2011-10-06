@@ -17,7 +17,7 @@
             <selected>false</selected>
         </descriptor>
         <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#acidicGroupCount">
-            <selected>true</selected>
+            <selected>false</selected>
         </descriptor>
         <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#aminoAcidsCount">
             <selected>false</selected>
@@ -44,7 +44,7 @@
             <selected>false</selected>
         </descriptor>
         <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#basicGroupCount">
-            <selected>true</selected>
+            <selected>false</selected>
         </descriptor>
         <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#bondCount">
             <selected>true</selected>
@@ -71,7 +71,7 @@
             <selected>false</selected>
         </descriptor>
         <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#fmf">
-            <selected>true</selected>
+            <selected>false</selected>
         </descriptor>
         <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#gravitationalIndex">
             <selected>false</selected>
@@ -86,7 +86,7 @@
             <selected>false</selected>
         </descriptor>
         <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#ip">
-            <selected>true</selected>
+            <selected>false</selected>
         </descriptor>
         <descriptor spec="http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#kierHallSmarts">
             <selected>false</selected>
