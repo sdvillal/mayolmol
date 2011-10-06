@@ -109,7 +109,9 @@ def spectrophores_to_arff(directory, master_file, spec_csv, to_predict):
     f = open(specs, 'r')
     data = []
     for line in f:
-        data.append(map(lambda a: float(a.strip()), line.split(',')))
+        #data.append(map(lambda a: float(a.strip()), line.split(',')))
+        if len(line.strip()):
+            data.append(map(floatOrNaN, line.strip().split(",")))
     x = np.array(data)
     feature_names = ['ID']
     f.close()
@@ -162,7 +164,7 @@ if __name__ == '__main__':
     for dataset in datasets:
         print dataset
         prop4da(dataset)
-    #spectrophores_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-ob-spectrophores.csv", "tPSA")
+    #spectrophores_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "4mol_prepared_master.csv", "4mol_prepared-ob-spectrophores.csv", "tPSA")
     #cdk_desc_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-cdk.csv", "tPSA")
     #cdk_fpt_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-cdk-estate.csv", "tPSA", "estate")
 

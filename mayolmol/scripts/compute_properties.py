@@ -35,6 +35,7 @@ def spectrophores(dataset, overwrite=True):
                 f.write("\n")
             f.close()
             print '\tSpectrophores computed succesfully'
+            return destfile
     except Exception, e:
         print 'Damn, there has been a problem computing the spectrophores...'
         print 'Research into this...'

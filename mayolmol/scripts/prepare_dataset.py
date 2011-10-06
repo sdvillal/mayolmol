@@ -140,6 +140,7 @@ def prepare_user_dataset(root, dataset_name, field, dest=None, overwrite=False):
     sali_table = op.join(dest_sdf[:-4] + '_saliviewer.csv')
     print '\tCreating \"saliviewer\" table: %s' % sali_table
     create_saliviewer_input(master_table, sali_table)
+    return dest_sdf, master_table
 
 if __name__ == '__main__':
     if len(sys.argv) > 3:
