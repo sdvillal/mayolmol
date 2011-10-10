@@ -122,5 +122,5 @@ def merge_arff2(directory, dest_arff, arff1, arff2):
     return  relation, classes, attributes, x, y
 
 
-print merge_arff2("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "final.arff", "4mol_prepared-cdk.arff", "4mol_prepared-cdk-estate.arff")
+#print merge_arff2("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "final.arff", "4mol_prepared-cdk.arff", "4mol_prepared-cdk-estate.arff")
 #print load_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example/4mol_prepared-cdk.arff")
