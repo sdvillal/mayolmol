@@ -105,7 +105,7 @@ def prepare_user_dataset(root, dataset_name, field, dest=None, overwrite=False):
     dest_sdf = op.join(dest, dataset_name[:-4] + "_prepared.sdf")
     if op.exists(dest_sdf) and not overwrite:
         print '%s is already there and not overwriting requested' % dest_sdf
-        return
+        sys.exit()
 
     print "Desalting molecules..."
     dataset = desalt(dataset, op.splitext(dataset)[0] + "_desalted.sdf")

@@ -14,7 +14,7 @@ def generate_names(num, prefix='f-'):
     num_digits = len(str(num - 1))
     return [prefix + str(fNum).zfill(num_digits) for fNum in range(num)]
 
-def load_arff(src):
+def load_arff(src, rename_classes = True):
     """ Load a dense arff with continuous features and a class as the last attribute.
         No support for sparsity, string, nominal or date attributes, missing values,
         weights, comments and other goodies, no error checking, but this will do for the moment.
@@ -43,13 +43,21 @@ def load_arff(src):
             elif line.strip().lower().startswith('@data'):
                 break
                 #Data
-        for line in src:
-            data = line.strip().split(',')
-            if len(data) == len(attributes):  #Lame check
-                x.append(map(float, data[:-1]))
-                y.append(classes[data[-1]])
-
-        return name, attributes, classes, np.array(x), np.array(y)
+        if rename_classes:
+            for line in src:
+                data = line.strip().split(',')
+                if len(data) == len(attributes):  #Lame check
+                    x.append(map(float, data[:-1]))
+                    y.append(classes[data[-1]])
+        else:
+            for line in src:
+                data = line.strip().split(',')
+                if len(data) == len(attributes):  #Lame check
+                    x.append(map(float, data[:-1]))
+                    print data[-1]
+                    y.append(float(data[-1]))
+            
+    return name, attributes, classes, np.array(x), np.array(y)
 
 def save_tab(x, y, dest, format='%.8g', classes=None):
     """ This should be saved with .txt or .csv extension, it is NOT tab
@@ -101,23 +109,25 @@ def mergearffs(dest, arff1, *args):
                 for line in src:
                     dest.write(line)
 
-def merge_arff2(directory, dest_arff, arff1, arff2):
+def merge_arff2(directory, dest_arff, arff1, arff2, rename_classes):
     """Function to merge 2 .arff files that share: the relation name,
     the class to predict as last column, the id of the instances as 
     first column, the same instances. The files present different 
     features. It is somehow an 'horizontal' merge. NB: there is no
     check realized at the moment, but the order of the instances should
-    be the same in both files. In case of a classification prolem, the 
-    class will appear in the last column as 0, 1, ... nb class and refer
-    to the class definition order of @attribute class {}"""
+    be the same in both files. In case of a classification prolem and 
+    if rename_class is set to True, the class will appear in the last 
+    column as 0, 1, ... nb class and refer to the class definition order 
+    of @attribute class {}"""
     output_file = op.join(directory, dest_arff)
     file1 = op.join(directory, arff1)
     file2 = op.join(directory, arff2)
-    relation, attributes1, classes, x1, y = load_arff(file1)
+    relation, attributes1, classes, x1, y = load_arff(file1, rename_classes)
     _, attributes2, _, x2, _ = load_arff(file2)
     attributes = attributes1[:-1] + attributes2[1:-1]
     x22 = np.delete(x2, 0, 1)
     x = np.hstack((x1,x22))
+    print y
     save_arff(x, y, output_file, relation_name = relation, feature_names = attributes, classes = classes)
     return  relation, classes, attributes, x, y
 
