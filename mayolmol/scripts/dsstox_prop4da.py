@@ -111,7 +111,7 @@ def spectrophores_to_arff(directory, master_file, spec_csv, to_predict):
     for line in f:
         #data.append(map(lambda a: float(a.strip()), line.split(',')))
         if len(line.strip()):
-            data.append(map(floatOrNaN, line.strip().split(",")))
+            data.append(map(floatOrNaN, line.strip().split(",")[:-1]))
     x = np.array(data)
     feature_names = ['ID']
     f.close()
@@ -132,7 +132,7 @@ def cdk_desc_to_arff(directory, master_file, desc_csv, to_predict):
         if len(line.strip()):
             data.append(map(floatOrNaN, line.strip().split("\t")))        
     f.close()
-    x = np.array(data[0:-1])
+    x = np.array(data)
     arff_file = op.join(directory, op.splitext(desc_csv)[0] + ".arff")
     mlio.save_arff(x, y, arff_file, relation_name=to_predict, feature_names=feature_names, classes=classes)
     

@@ -32,7 +32,7 @@ if __name__ == "__main__":
                                                             fingerprint=fingerprint,
                                                             addH=True)
                 fingerprint_files.append((fingerprint, op.splitext(prepared_data)[0] + '-cdk-' + fingerprint + '.csv'))
-            spectrophores_file = prop.spectrophores(dataset)
+            spectrophores_file = prop.spectrophores(prepared_data)
             print "Converting to .arff format the spectrophore file %s."%spectrophores_file
             arff.spectrophores_to_arff(directory, op.basename(master_file), op.basename(spectrophores_file), to_predict)
             print "Converting to .arff format the intrinsic descriptors file %s."%descriptors_file

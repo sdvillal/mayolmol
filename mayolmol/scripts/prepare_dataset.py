@@ -8,6 +8,7 @@ import glob
 import csv
 import operator
 import sys
+import mayolmol.scripts.dsstox_depict as pics
 
 def rename_mols_by_index(mols, prefix=''):
     num_mols_num_chars = len(str(len(mols)))
@@ -113,7 +114,10 @@ def prepare_user_dataset(root, dataset_name, field, dest=None, overwrite=False):
     print 'Removing duplicated molecules...'
     unique_mols = keep_unique(mols)
     print 'Removing missing values in the field of interest...'
-    unique_mols = removeMissingValue(unique_mols, field) 
+    unique_mols = removeMissingValue(unique_mols, field)
+    if unique_mols == []:
+        print "Sorry, the class you want to predict appear not to be defined in your dataset. Please, always define one of the fields of the input file as the target property." 
+        sys.exit()
     print 'Re-indexing the compounds...'
     rename_mols_by_index(unique_mols)
 
@@ -132,7 +136,6 @@ def prepare_user_dataset(root, dataset_name, field, dest=None, overwrite=False):
 
     print '\tSaving compounds'
     save_mols(unique_mols, dest_sdf)
-
     master_table = op.join(dest_sdf[:-4] + '_master.csv')
     print '\tCreating \"master\" table: %s' % master_table
     create_master_table(dest_sdf, master_table, [field])
@@ -140,6 +143,7 @@ def prepare_user_dataset(root, dataset_name, field, dest=None, overwrite=False):
     sali_table = op.join(dest_sdf[:-4] + '_saliviewer.csv')
     print '\tCreating \"saliviewer\" table: %s' % sali_table
     create_saliviewer_input(master_table, sali_table)
+    pics.depict(dest_sdf)
     return dest_sdf, master_table
 
 if __name__ == '__main__':
@@ -151,6 +155,8 @@ if __name__ == '__main__':
         if op.exists(op.join(directory, user_data)) and to_predict != "":
             prepare_user_dataset(directory, user_data, to_predict)
         else:
-            print "Problem with the input. Try again."
+            print "Problem with the input. Either the dataset doesn't exist or you didn't precise the name of the class to predict."
+            sys.exit()
     else:
-            print "Problem with the input. Try again."
+            print "Problem with the input. Remember that\n - the first argument is the directory where the dataset is stored.\n - the second argument is the name of the property you want to predict\n - the third argument is the name of the .sdf file containing your data"
+            sys.exit()

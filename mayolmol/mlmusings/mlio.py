@@ -100,3 +100,27 @@ def mergearffs(dest, arff1, *args):
                         break
                 for line in src:
                     dest.write(line)
+
+def merge_arff2(directory, dest_arff, arff1, arff2):
+    """Function to merge 2 .arff files that share: the relation name,
+    the class to predict as last column, the id of the instances as 
+    first column, the same instances. The files present different 
+    features. It is somehow an 'horizontal' merge. NB: there is no
+    check realized at the moment, but the order of the instances should
+    be the same in both files. In case of a classification prolem, the 
+    class will appear in the last column as 0, 1, ... nb class and refer
+    to the class definition order of @attribute class {}"""
+    output_file = op.join(directory, dest_arff)
+    file1 = op.join(directory, arff1)
+    file2 = op.join(directory, arff2)
+    relation, attributes1, classes, x1, y = load_arff(file1)
+    _, attributes2, _, x2, _ = load_arff(file2)
+    attributes = attributes1[:-1] + attributes2[1:-1]
+    x22 = np.delete(x2, 0, 1)
+    x = np.hstack((x1,x22))
+    save_arff(x, y, output_file, relation_name = relation, feature_names = attributes, classes = classes)
+    return  relation, classes, attributes, x, y
+
+
+print merge_arff2("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "final.arff", "4mol_prepared-cdk.arff", "4mol_prepared-cdk-estate.arff")
+#print load_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example/4mol_prepared-cdk.arff")
