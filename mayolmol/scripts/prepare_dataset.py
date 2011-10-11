@@ -110,14 +110,20 @@ def prepare_user_dataset(root, dataset_name, field, dest=None, overwrite=False):
     print "Desalting molecules..."
     dataset = desalt(dataset, op.splitext(dataset)[0] + "_desalted.sdf")
     print 'Reading dataset into pybel molecules...'
-    mols = pybel.readfile('sdf', dataset)
+    mols = list(pybel.readfile('sdf', dataset))
+    init_number = len(mols)
+    print "Your initial dataset contain %i molecules."%init_number
     print 'Removing duplicated molecules...'
     unique_mols = keep_unique(mols)
+    nb_rem_dup = init_number - len(unique_mols)
+    print "We found and removed %i duplicated molecules."%nb_rem_dup
     print 'Removing missing values in the field of interest...'
     unique_mols = removeMissingValue(unique_mols, field)
     if unique_mols == []:
         print "Sorry, the class you want to predict appear not to be defined in your dataset. Please, always define one of the fields of the input file as the target property." 
         sys.exit()
+    nb_rem_mis = init_number - nb_rem_dup - len(unique_mols)
+    print "We found and removed %i molecules for which the class was not defined."%nb_rem_mis
     print 'Re-indexing the compounds...'
     rename_mols_by_index(unique_mols)
 
