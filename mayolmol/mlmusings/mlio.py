@@ -9,6 +9,7 @@ import shlex
 import csv
 import math
 import numpy as np
+import pybel
 
 def generate_names(num, prefix='f-'):
     num_digits = len(str(num - 1))
@@ -131,6 +132,21 @@ def merge_arff2(directory, dest_arff, arff1, arff2, rename_classes):
     save_arff(x, y, output_file, relation_name = relation, feature_names = attributes, classes = classes)
     return  relation, classes, attributes, x, y
 
-
+def data_fields(directory, sdf_file):
+    """This function returns the list of fields (other than atom 
+    coordinates) present in an .sdf file"""
+    mols = pybel.readfile("sdf", op.join(directory, sdf_file))
+    fields = []
+    for mol in mols:
+        field = mol.data.keys()
+        for item in field:
+            if item not in fields and item not in ["OpenBabel Symmetry Classes"]:
+                fields.append(item)
+    return fields        
+    
+        
+    
+    
 #print merge_arff2("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "final.arff", "4mol_prepared-cdk.arff", "4mol_prepared-cdk-estate.arff")
 #print load_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example/4mol_prepared-cdk.arff")
+#print data_fields("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol.sdf")

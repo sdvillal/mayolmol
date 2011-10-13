@@ -9,6 +9,7 @@ import os.path as op
 import numpy as np
 from mayolmol.mlmusings import mlio
 from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
+import itertools
 
 def infer_classes(y, max_distinct=10):
     """ Return the present classes in y or None if this is a regression problem.
@@ -62,6 +63,32 @@ def floatOrNaN(string):
         return float(string)
     except Exception:
         return float('NaN')
+        
+def numeric_class_proportions(y):
+    """This function gives the number of instances for each class (can 
+    be boolean or int) in the input dataset. Of course, it should be 
+    used only if it is a classification problem with no string values. 
+    Thanks to http://stackoverflow.com/questions/4651683/numpy-grouping
+    -using-itertools-groupby-performance"""
+    total = len(y)
+    y.sort()
+    diff = np.concatenate(([1],np.diff(y)))
+    idx = np.concatenate((np.where(diff)[0],[len(y)]))
+    index = np.empty(len(idx)-1, dtype='u2,u2')
+    index['f0']=y[idx[:-1]]
+    index['f1']=np.diff(idx)
+    return total, index
+    
+def string_class_proportions(y):
+    """Here, the class values are strings or a mix of real and string 
+    values. Thanks to http://stackoverflow.com/questions/4651683/numpy-
+    grouping-using-itertools-groupby-performance"""
+    total = len(y)
+    y.sort()
+    yunique = np.unique(y)
+    groups = ((k,sum(1 for i in g)) for k,g in itertools.groupby(y))
+    index = np.fromiter(groups,dtype='|S1,u2')
+    return total, index
 
 def cdkdeskui2dense(cdkdescui_fpfile, sep='\t'):
     with open(cdkdescui_fpfile) as src:
@@ -157,6 +184,20 @@ def cdk_fpt_to_arff(directory, master_file, fpt_csv, to_predict, fpt_type):
     arff_file = op.join(directory, op.splitext(fpt_csv)[0] + ".arff")
     mlio.save_arff(x, y, arff_file, relation_name=to_predict, feature_names=feature_names, classes=classes)
     
+def analyze_class(directory, master_file, max_classes=10):
+    y = read_y_from_master(op.join(directory,master_file))
+    yunique = infer_classes(y, max_classes)
+    if yunique:
+        print "It is a classification problem, with %i different classes."%len(yunique)
+        if "|S" in y.dtype():
+            counts = string_class_proportions(y)
+        else:
+            counts = numeric_class_proportions(y)
+    else:
+        print "It is a regression problem."
+        counts = len(y)
+    return counts    
+    
 if __name__ == '__main__':
     root = DEFAULT_DSSTOX_DIR
     datasets = sorted([name for name in os.listdir(root) if op.isdir(op.join(root, name))])
@@ -167,6 +208,8 @@ if __name__ == '__main__':
     #spectrophores_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "4mol_prepared_master.csv", "4mol_prepared-ob-spectrophores.csv", "tPSA")
     #cdk_desc_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-cdk.csv", "tPSA")
     #cdk_fpt_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-cdk-estate.csv", "tPSA", "estate")
+    #print string_class_proportions(np.array(["a","a",2,"b","a","a",2]))
+    #print numeric_class_proportions(np.array([False, True, False, False, False, True]))
 
 #TODO: Save the compound ID too
 #TODO: be robust to failed description computation
