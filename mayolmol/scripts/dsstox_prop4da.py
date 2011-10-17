@@ -20,20 +20,33 @@ def infer_classes(y, max_distinct=10):
     if len(yunique) > max_distinct:
         return None
     return sorted(yunique)
-
-def read_y(root, dataset, label):
-    if op.exists(op.join(root, dataset, dataset + '-master.csv')):
-        return read_y_from_master(op.join(root, dataset, dataset + '-master.csv'))
-    else:
-        mols = pybel.readfile("sdf", op.join(root, dataset))
-        y = []
-        for mol in mols:
-            try:
-                y.append(float(mol.data[label]))
-            except ValueError:
-                y.append(mol.data[label])
-        return np.array(y)
+    
+def infer_classes_from_initial_data(y, idfun=None, max_distinct=10):
+    """ Return the present classes in y or None if this is a regression 
+    problem. Doesn't use numpy, y is a simple python list. Thanks to 
+    http://www.peterbe.com/plog/uniqifiers-benchmark"""
+    if not idfun:
+        def idfun(x): return x
+    seen = {}
+    result = []
+    for val in y:
+        marker = idfun(val)
+        if marker in seen: continue
+        seen[marker] = 1
+        result.append(val)    
+    if len(result) > max_distinct:
+        return None
+    return result
         
+def read_y(root, dataset):
+    return read_y_from_master(op.join(root, dataset, dataset + '-master.csv'))
+            
+def read_y_from_initial_data(root, dataset, label):
+    mols = pybel.readfile("sdf", op.join(root, dataset))
+    y = []
+    for mol in mols:
+        y.append(mol.data[label])
+    return y
 
 def read_y_from_master(masterfile):
     with open(masterfile) as master:
@@ -43,6 +56,38 @@ def read_y_from_master(masterfile):
         except ValueError:
             y = [line.split(',')[2] for line in master]
         return np.array(y)
+        
+def from_class_to_index(y, directory):
+    classes = infer_classes_from_initial_data(y)
+    index1 = {} 
+    index2 = {}
+    f = open(op.join(directory, "class_index.txt"), 'w')
+    for classe in classes:
+        index1[classe] = classes.index(classe)
+        index2[classes.index(classe)] = classe
+    for key,value in index1.iteritems():
+        f.write(key)
+        f.write("\t")
+        f.write(str(value))
+        f.write("\n")
+    f.close()
+    return index1, index2
+    
+def read_index(directory):
+    f = open(op.join(directory, "class_index.txt"), 'r')
+    index1 = {}
+    index2 = {}
+    for line in f:
+        index1[line.split()[0]] = int(line.split()[1])
+        index2[int(line.split()[1])] = line.split()[0]
+    return index1, index2
+            
+def rename_classes(y, directory):
+    y2 = []
+    index, _ = read_index(directory)
+    for classe in y:
+        y2.append(index[classe])
+    return np.array(y2), index
 
 def cdkdeskuifps2dense(cdkdescui_fpfile, sep=' ', keep_id = False):
     with open(cdkdescui_fpfile) as src:
@@ -200,15 +245,15 @@ def cdk_fpt_to_arff(directory, master_file, fpt_csv, to_predict, fpt_type):
     mlio.save_arff(x, y, arff_file, relation_name=to_predict, feature_names=feature_names, classes=classes)
     
 def analyze_class(directory, dataset, label, max_classes=10):
-    y = read_y(directory, dataset, label)
-    yunique = infer_classes(y, max_classes)
+    y = read_y_from_initial_data(directory, dataset, label)
+    yunique = infer_classes_from_initial_data(y, max_classes)
     if yunique:
         print "It is a classification problem, with %i different classes."%len(yunique)
-        if "|S" in str(y.dtype):
-            print "string"
-            counts = string_class_proportions(y)
-        else:
-            counts = numeric_class_proportions(y)
+        print "Now renaming the classes into indinces..."
+        y, index = rename_classes(y)
+        print "The schema followed to rename the classes is the following:"
+        print index
+        counts = numeric_class_proportions(y)
         return counts
     else:
         print "It is a regression problem." 
@@ -227,6 +272,9 @@ if __name__ == '__main__':
     #cdk_fpt_to_arff("/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example", "1000mol_dirty_prepared_master.csv", "1000mol_dirty_prepared-cdk-estate.csv", "tPSA", "estate")
     #print string_class_proportions(np.array(["a","a",2,"b","a","a",2]))
     #print numeric_class_proportions(np.array([False, True, False, False, False, True]))
+    #print infer_classes_from_initial_data(["1", "1", "1.05", "?", "0.5", "?"])
+    #print from_class_to_index(["1", "1", "1.05", "?", "0.5", "?"], "/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example")
+    #print rename_classes(["1", "1", "1.05", "?", "0.5", "?"],"/mmb/pluto/fmontanari/Build/FAFDrugs2.2/example")
 
 #TODO: Save the compound ID too
 #TODO: be robust to failed description computation

@@ -55,7 +55,6 @@ def load_arff(src, rename_classes = True):
                 data = line.strip().split(',')
                 if len(data) == len(attributes):  #Lame check
                     x.append(map(float, data[:-1]))
-                    print data[-1]
                     y.append(float(data[-1]))
             
     return name, attributes, classes, np.array(x), np.array(y)
@@ -128,7 +127,6 @@ def merge_arff2(directory, dest_arff, arff1, arff2, rename_classes):
     attributes = attributes1[:-1] + attributes2[1:-1]
     x22 = np.delete(x2, 0, 1)
     x = np.hstack((x1,x22))
-    print y
     save_arff(x, y, output_file, relation_name = relation, feature_names = attributes, classes = classes)
     return  relation, classes, attributes, x, y
 

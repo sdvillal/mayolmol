@@ -9,6 +9,7 @@ import csv
 import operator
 import sys
 import mayolmol.scripts.dsstox_depict as pics
+import mayolmol.scripts.dsstox_prop4da as prop4da
 
 def rename_mols_by_index(mols, prefix=''):
     num_mols_num_chars = len(str(len(mols)))
@@ -30,7 +31,7 @@ def select_columns(csv_file, columns=None):
             else: projection.append(operator.itemgetter(*columns)(values))
     return projection
 
-def create_master_table(sdf_file, dest_file, fields=None):
+def create_master_table(sdf_file, dest_file, fields=None, rename_classes=False, index=None):
     if not fields: fields = ['Tox']
     reader = pybel.readfile('sdf', sdf_file)  #Need to tell to implement __exit__
     with open(dest_file, 'w') as writer:
@@ -39,12 +40,21 @@ def create_master_table(sdf_file, dest_file, fields=None):
         #Data
         for mol in reader:
             values = [mol.title, mol.write('can').split()[0]]
-            for field in fields:
-                if mol.data[field]:
-                    values.append(mol.data[field])
-                else:
-                    values.append('')
-            writer.write(','.join(values) + '\n')
+            if not rename_classes:
+                for field in fields:
+                    if mol.data[field]:
+                        values.append(mol.data[field])
+                    else:
+                        values.append('')
+                writer.write(','.join(values) + '\n')
+            else:
+                for field in fields:
+                    if mol.data[field]:
+                        values.append(str(index[mol.data[field]]))
+                    else:
+                        values.append('')
+                writer.write(','.join(values) + '\n')
+                    
 
 def create_saliviewer_input(master_file, dest_file):
     input = select_columns(master_file, (1, 0, 2))[1:] #Remove the header
@@ -144,7 +154,7 @@ def prepare_user_dataset(root, dataset_name, field, dest=None, overwrite=False):
     save_mols(unique_mols, dest_sdf)
     master_table = op.join(dest_sdf[:-4] + '_master.csv')
     print '\tCreating \"master\" table: %s' % master_table
-    create_master_table(dest_sdf, master_table, [field])
+    create_master_table(dest_sdf, master_table, [field], rename_classes=True, index=prop4da.read_index(root)[0])
 
     sali_table = op.join(dest_sdf[:-4] + '_saliviewer.csv')
     print '\tCreating \"saliviewer\" table: %s' % sali_table
