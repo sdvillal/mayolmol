@@ -10,6 +10,7 @@ import numpy as np
 from mayolmol.mlmusings import mlio
 from mayolmol.scripts.dsstox_prep import DEFAULT_DSSTOX_DIR
 import itertools
+import pybel
 
 def infer_classes(y, max_distinct=10):
     """ Return the present classes in y or None if this is a regression problem.
@@ -20,13 +21,27 @@ def infer_classes(y, max_distinct=10):
         return None
     return sorted(yunique)
 
-def read_y(root, dataset):
-    return read_y_from_master(op.join(root, dataset, dataset + '-master.csv'))
+def read_y(root, dataset, label):
+    if op.exists(op.join(root, dataset, dataset + '-master.csv')):
+        return read_y_from_master(op.join(root, dataset, dataset + '-master.csv'))
+    else:
+        mols = pybel.readfile("sdf", op.join(root, dataset))
+        y = []
+        for mol in mols:
+            try:
+                y.append(float(mol.data[label]))
+            except ValueError:
+                y.append(mol.data[label])
+        return np.array(y)
+        
 
 def read_y_from_master(masterfile):
     with open(masterfile) as master:
         master.next()
-        y = [float(line.split(',')[2]) for line in master]
+        try:
+            y = [float(line.split(',')[2]) for line in master]
+        except ValueError:
+            y = [line.split(',')[2] for line in master]
         return np.array(y)
 
 def cdkdeskuifps2dense(cdkdescui_fpfile, sep=' ', keep_id = False):
@@ -184,19 +199,21 @@ def cdk_fpt_to_arff(directory, master_file, fpt_csv, to_predict, fpt_type):
     arff_file = op.join(directory, op.splitext(fpt_csv)[0] + ".arff")
     mlio.save_arff(x, y, arff_file, relation_name=to_predict, feature_names=feature_names, classes=classes)
     
-def analyze_class(directory, master_file, max_classes=10):
-    y = read_y_from_master(op.join(directory,master_file))
+def analyze_class(directory, dataset, label, max_classes=10):
+    y = read_y(directory, dataset, label)
     yunique = infer_classes(y, max_classes)
     if yunique:
         print "It is a classification problem, with %i different classes."%len(yunique)
-        if "|S" in y.dtype():
+        if "|S" in str(y.dtype):
+            print "string"
             counts = string_class_proportions(y)
         else:
             counts = numeric_class_proportions(y)
+        return counts
     else:
-        print "It is a regression problem."
+        print "It is a regression problem." 
         counts = len(y)
-    return counts    
+        return [counts]
     
 if __name__ == '__main__':
     root = DEFAULT_DSSTOX_DIR

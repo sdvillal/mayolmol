@@ -50,7 +50,6 @@ if __name__ == "__main__":
             mlio.merge_arff2(directory, dest_arff2, op.splitext(prepared_data)[0] + "-cdk-maccs.arff", op.splitext(prepared_data)[0] + "-cdk-estate.arff", False)
             mlio.merge_arff2(directory, dest_arff3, dest_arff1, dest_arff2, False)
             mlio.merge_arff2(directory, dest_arff_master, dest_arff3, op.splitext(prepared_data)[0] + "-cdk-extended.arff", True)
-            arff.analyze_class(directory, op.basename(master_file))
         else:
             print "There is no such file %s."%dataset
             sys.exit()
